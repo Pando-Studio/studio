@@ -35,7 +35,7 @@ export function AudioDisplay({ data }: WidgetDisplayProps) {
 
       {audio.audioUrl ? (
         <Card className="p-4">
-          <audio ref={audioRef} controls className="w-full" src={audio.audioUrl}>
+          <audio ref={audioRef} controls className="w-full" src={`/api/media?url=${encodeURIComponent(audio.audioUrl)}`}>
             Your browser does not support the audio element.
           </audio>
           {audio.duration && (

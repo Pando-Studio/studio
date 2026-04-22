@@ -40,7 +40,8 @@ export function generateS3Key(filename: string, studioId: string, userId?: strin
 export async function uploadToS3(
   file: Buffer | Blob,
   s3Key: string,
-  contentType: string
+  contentType: string,
+  options?: { publicRead?: boolean }
 ): Promise<{ s3Key: string; url: string }> {
   const body = file instanceof Blob ? Buffer.from(await file.arrayBuffer()) : file;
 
@@ -50,6 +51,7 @@ export async function uploadToS3(
       Key: s3Key,
       Body: body,
       ContentType: contentType,
+      ...(options?.publicRead && { ACL: 'public-read' }),
     })
   );
 

@@ -136,7 +136,7 @@ export async function generateImage(
         const ext = result.mimeType === 'image/png' ? 'png' : 'jpg';
         const filename = `generated-${Date.now()}.${ext}`;
         const s3Key = generateS3Key(filename, studioId);
-        const s3Result = await uploadToS3(buffer, s3Key, result.mimeType);
+        const s3Result = await uploadToS3(buffer, s3Key, result.mimeType, { publicRead: true });
 
         return {
           imageUrl: s3Result.url,

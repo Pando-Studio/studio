@@ -190,8 +190,8 @@ const quickGenerateConfig: Record<GenerationType, {
   PROGRAM_OVERVIEW: { templateId: 'qiplim/program-overview-generation', defaultInputs: {}, defaultTitle: 'Programme', requiresModal: false },
   CLASS_OVERVIEW: { templateId: 'qiplim/class-overview-generation', defaultInputs: {}, defaultTitle: 'Classe', requiresModal: false },
   QCM: { templateId: 'qiplim/qcm-evaluation', defaultInputs: { questionCount: 10, optionsPerQuestion: 4 }, defaultTitle: 'QCM', requiresModal: false },
-  AUDIO: { defaultInputs: {}, defaultTitle: 'Audio', requiresModal: false },
-  VIDEO: { defaultInputs: {}, defaultTitle: 'Video', requiresModal: false },
+  AUDIO: { templateId: 'qiplim/audio-podcast', defaultInputs: { targetDuration: '3', tone: 'casual', style: 'discussion', speakerCount: '2' }, defaultTitle: 'Audio', requiresModal: false },
+  VIDEO: { templateId: 'qiplim/video-slideshow', defaultInputs: { slideCount: 8, targetDuration: '3', tone: 'professional' }, defaultTitle: 'Video', requiresModal: false },
 };
 
 // Section components

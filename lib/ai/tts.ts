@@ -126,7 +126,7 @@ export async function generatePodcastAudio(
   // Upload to S3
   const filename = `podcast-${Date.now()}.mp3`;
   const s3Key = generateS3Key(filename, studioId);
-  const s3Result = await uploadToS3(combinedAudio, s3Key, 'audio/mpeg');
+  const s3Result = await uploadToS3(combinedAudio, s3Key, 'audio/mpeg', { publicRead: true });
 
   return {
     audioUrl: s3Result.url,
@@ -170,7 +170,7 @@ export async function generateVideoNarration(
     // Upload each slide's audio to S3
     const filename = `narration-${slide.id}-${Date.now()}.mp3`;
     const s3Key = generateS3Key(filename, studioId);
-    const s3Result = await uploadToS3(result.audioBuffer, s3Key, 'audio/mpeg');
+    const s3Result = await uploadToS3(result.audioBuffer, s3Key, 'audio/mpeg', { publicRead: true });
     slideAudioUrls[slide.id] = s3Result.url;
   }
 

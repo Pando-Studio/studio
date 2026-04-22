@@ -49,8 +49,8 @@ export function VideoDisplay({ data }: WidgetDisplayProps) {
             ref={videoRef}
             controls
             className="w-full"
-            src={video.videoUrl}
-            poster={video.thumbnailUrl}
+            src={`/api/media?url=${encodeURIComponent(video.videoUrl)}`}
+            poster={video.thumbnailUrl ? `/api/media?url=${encodeURIComponent(video.thumbnailUrl)}` : undefined}
           >
             Your browser does not support the video element.
           </video>

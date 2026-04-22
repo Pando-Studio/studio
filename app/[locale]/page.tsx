@@ -421,11 +421,6 @@ export default function HomePage() {
             {t('hero.subtitle')}
           </p>
 
-          {/* NotebookLM badge */}
-          <p className="text-center text-sm text-muted-foreground mb-8 animate-fade-up animation-delay-300">
-            {t('hero.notebookBadge')}
-          </p>
-
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-up animation-delay-450">
             <a href="/dashboard">

@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">Qiplim Studio</h1>
-  <p align="center">AI-powered interactive learning content from any document</p>
+  <p align="center">Open-source NotebookLM alternative — LLM-agnostic, self-hostable</p>
 </p>
 
 <p align="center">
@@ -11,23 +11,33 @@
 
 ---
 
-Qiplim Studio transforms documents into interactive learning experiences. Upload a PDF, paste a URL, or connect Google Drive — the AI generates quizzes, flashcards, timelines, podcasts, mind maps, and 28 other widget types automatically.
+Qiplim Studio turns any document into learning experiences — like NotebookLM, but open source and LLM-agnostic. Upload a PDF, paste a URL, or connect Google Drive. The AI generates podcasts, quizzes, summaries, flashcards, mind maps, presentations, and 20+ other formats automatically.
 
-**Try it live:** [studio.qiplim.com](https://studio.qiplim.com) — a hosted instance maintained by [Pando Studio](https://pando-studio.com), the company behind Qiplim.
+Bring your own LLM keys (Mistral, OpenAI, Anthropic, Google), self-host on your infrastructure, or use the hosted instance.
+
+**Try it live:** [studio.qiplim.com](https://studio.qiplim.com) — hosted by [Pando Studio](https://pando-studio.com), the company behind Qiplim.
 
 ## Features
 
-- **28 widget types** — quizzes, flashcards, summaries, FAQs, timelines, mind maps, infographics, audio podcasts, video slideshows, presentations, and more
-- **Multi-LLM support** — Mistral (default), OpenAI, Anthropic, Google Gemini. Bring Your Own Key (BYOK) per user
+**Content generation (28 formats)**
+- **Interactive** — quizzes, QCM, flashcards, ranking, word clouds, post-it, roleplay, open text
+- **Static** — summaries, FAQs, glossaries, timelines, reports, data tables
+- **Media** — audio podcasts (multi-voice TTS), video slideshows, mind maps, infographics
+- **Pedagogical** — course plans, session plans, syllabi, program overviews
+- **Composition** — combine formats into presentations, sequences, and course modules
+
+**AI & Data**
+- **Multi-LLM (BYOK)** — Mistral (default), OpenAI, Anthropic, Google Gemini. Each user brings their own keys
 - **RAG pipeline** — hybrid search (pgvector + tsvector), HyDE, contextual embeddings, Jina reranking
-- **Document processing** — PDF, DOCX, PPTX via Docling (self-hosted) or Unstructured.io (SaaS)
-- **Intelligent chat** — unified AI agent with 24 auto-generated tools, citations, @mentions, memory
-- **Composition** — combine widgets into presentations, sequences, and course modules
-- **Player system** — self-paced playback with progress tracking and scoring
-- **Public API** — stateless generation endpoints, OpenAPI 3.1 spec, API key auth
+- **Document processing** — PDF, DOCX, PPTX, web pages, YouTube via Docling (self-hosted) or Unstructured.io
+- **Intelligent chat** — unified AI agent with auto-generated tools, citations, @mentions, memory
+
+**Platform**
+- **Self-hostable** — Docker Compose, PostgreSQL, Redis. Your data stays on your servers
+- **Public API** — stateless generation endpoints, OpenAPI 3.1, API key auth
 - **MCP server** — integrate with Claude Code, Cursor, and other MCP clients
+- **Player system** — self-paced playback with progress tracking and scoring
 - **i18n** — French and English (next-intl)
-- **Self-hostable** — Docker Compose, PostgreSQL, Redis
 
 ## Quick Start
 

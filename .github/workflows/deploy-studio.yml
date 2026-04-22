@@ -50,7 +50,7 @@ jobs:
         run: clever link ${{ secrets.CLEVER_APP_ID }} --alias studio-staging
 
       - name: Deploy
-        run: clever deploy --alias studio-staging --force
+        run: clever deploy --alias studio-staging --force --same-commit-policy=restart
 
       - name: Summary
         run: |

@@ -9,7 +9,7 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   // transpilePackages removed — standalone app, no workspace packages
-  serverExternalPackages: ['@prisma/client', '@prisma/engines', 'pg'],
+  serverExternalPackages: ['@prisma/client', '@prisma/engines', 'pg', 'remotion', '@remotion/renderer', '@remotion/bundler', '@remotion/media-utils', '@remotion/cli'],
   async headers() {
     return [
       {

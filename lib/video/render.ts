@@ -12,7 +12,8 @@ const HEIGHT = 1080;
 const COMPOSITION_ID = 'SlideshowVideo';
 
 // Entry point for Remotion — must be a file that registers the composition
-const ENTRY_POINT = path.resolve(__dirname, 'remotion-entry.tsx');
+// Use process.cwd() instead of __dirname because Next.js compiles to .next/server/
+const ENTRY_POINT = path.resolve(process.cwd(), 'lib/video/remotion-entry.tsx');
 
 /**
  * Calculate exact duration in frames for each slide based on its audio file.

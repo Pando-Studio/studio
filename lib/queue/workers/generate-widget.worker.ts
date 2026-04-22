@@ -195,9 +195,21 @@ async function processJob(
     }
 
     // Step 5: Video assembly (slideshow mode) — render slides + audio into MP4
+    const assemblyCheck = {
+      isVideoGeneration,
+      hasScript: !!generatedData.script,
+      slideCount: (generatedData.script as { slides?: unknown[] })?.slides?.length,
+    };
+    logger.info('Video assembly check', { runId, ...assemblyCheck });
+    // Persist check to DB for debugging (will be overwritten by final metadata)
+    await prisma.generationRun.update({
+      where: { id: runId },
+      data: { errorLog: `assembly_check: ${JSON.stringify(assemblyCheck)}` },
+    });
     if (isVideoGeneration && generatedData.script) {
       const slides = (generatedData.script as { slides: Array<Record<string, unknown>> }).slides;
       const hasAudio = slides.some((s) => s.audioUrl);
+      logger.info('Video assembly audio check', { runId, hasAudio, slidesWithAudio: slides.filter(s => s.audioUrl).length });
       if (hasAudio) {
         try {
           logger.generation('Assembling video with Remotion', { runId, slideCount: slides.length });
@@ -234,6 +246,11 @@ async function processJob(
           });
         } catch (renderError) {
           // Render failure is non-fatal: storyboard + audio still saved
+          // Persist error in generation run metadata for debugging
+          await prisma.generationRun.update({
+            where: { id: runId },
+            data: { errorLog: `Video assembly failed: ${renderError instanceof Error ? renderError.message : String(renderError)}` },
+          });
           logger.warn('Video assembly failed, storyboard with audio saved', {
             runId,
             error: renderError instanceof Error ? renderError.message : String(renderError),

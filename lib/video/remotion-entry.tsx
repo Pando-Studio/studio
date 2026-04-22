@@ -1,11 +1,11 @@
 import React from 'react';
-import { Composition } from 'remotion';
+import { registerRoot, Composition } from 'remotion';
 import { SlideshowComposition } from './composition';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const SlideshowComp = SlideshowComposition as React.FC<any>;
 
-export const RemotionVideo: React.FC = () => {
+const RemotionVideo: React.FC = () => {
   return (
     <>
       <Composition
@@ -19,3 +19,5 @@ export const RemotionVideo: React.FC = () => {
     </>
   );
 };
+
+registerRoot(RemotionVideo);

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 env:
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}

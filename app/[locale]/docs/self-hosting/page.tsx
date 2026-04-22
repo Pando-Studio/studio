@@ -78,8 +78,8 @@ export default function SelfHostingPage() {
         <h2 className="text-2xl font-bold mb-4">{t('installation')}</h2>
 
         <h3 className="text-lg font-semibold mb-2">{t('step1Clone')}</h3>
-        <CodeBlock>{`git clone https://github.com/Pando-Studio/qiplim-v2
-cd qiplim-v2`}</CodeBlock>
+        <CodeBlock>{`git clone https://github.com/Qiplim/studio.git
+cd studio`}</CodeBlock>
 
         <h3 className="text-lg font-semibold mb-2">{t('step2Install')}</h3>
         <CodeBlock>pnpm install</CodeBlock>

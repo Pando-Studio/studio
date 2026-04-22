@@ -3,64 +3,83 @@
 ## Structure
 
 ```
-docs/studio/
-├── development-plan.md  ← Plan d'action dev (phases, sprints, matrice widgets)
-├── specs/               ← Objectif a atteindre (vision, architecture, features)
-├── current/             ← Etat reel du code (ce qui existe aujourd'hui)
-├── prompts/             ← Prompts LLM pour les workflows Mastra
-├── archived/            ← Anciennes specs et references
-└── README.md            ← Ce fichier
+docs/
+├── development-plan.md  ← Development roadmap (phases, sprints, widget matrix)
+├── specs/               ← Target state (vision, architecture, features)
+│   ├── widgets/         ← Widget system, catalog, media specs
+│   ├── architecture/    ← Data model, API, realtime, lifecycle
+│   ├── ai/              ← RAG, chat, generative API
+│   ├── pedagogy/        ← Glossary, pedagogical structure, learning design
+│   ├── governance/      ← Multi-tenant, privacy/GDPR
+│   └── integration/     ← Providers, interoperability, open source plan
+├── current/             ← Actual code state (what exists today)
+├── prompts/             ← LLM prompts for Mastra generation workflows
+├── archived/            ← Legacy specs and references
+└── README.md            ← This file
 ```
 
-Comparer `specs/` et `current/` pour mesurer l'evolution et identifier les gaps.
+Compare `specs/` and `current/` to measure progress and identify gaps.
 
 ---
 
-## Plan de developpement
+## Development Plan
 
-- **[development-plan.md](development-plan.md)** — Plan d'action detaille. Phase 0 (fondations) → Phase 1 (widgets core : existants + NotebookLM + pedago) → Phase 2 (composition + distribution) → Phase 3 (multi-tenant + open source). Matrice des 41 widgets par phase.
+- **[development-plan.md](development-plan.md)** — Detailed roadmap. Phase 0 (foundations) -> Phase 1 (core widgets: existing + NotebookLM + pedagogy) -> Phase 2 (composition + distribution) -> Phase 3 (multi-tenant + open source). Matrix of 41 widgets by phase.
 
 ---
 
-## Specs (objectif)
+## Specs (target state)
 
-Les specs decrivent ce que le systeme DOIT etre. 16 documents, ~10 000 lignes.
-
-### Fondations
-- **[specs/glossary.md](specs/glossary.md)** — Definitions canoniques. Termes FR/EN, hierarchie pedagogique, roles. Lire en premier.
-- **[specs/widget-system-spec.md](specs/widget-system-spec.md)** — Architecture widget. Taxonomie (LEAF/COMPOSED), composition, lifecycle, 8 exemples detailles.
-- **[specs/data-model.md](specs/data-model.md)** — Schema Prisma complet (20 tables, enums, relations). Tables manquantes identifiees.
+Specs describe what the system SHOULD be. 23 documents across 6 categories.
 
 ### Widgets
-- **[specs/widget-catalog.md](specs/widget-catalog.md)** — Catalogue des 41 types. Schema JSON, settings modal, providers, scoring, contraintes par type.
-- **[specs/lifecycle.md](specs/lifecycle.md)** — Creation (chat, modal, manual) et lecture (playback states, self-paced, partage, tracking resultats).
 
-### Pedagogie
-- **[specs/pedagogical-structure.md](specs/pedagogical-structure.md)** — Hierarchie LMD + lycee + pro. 3 locales (fr-lmd, fr-secondary, fr-pro). 7 endpoints par niveau.
-- **[specs/pedagogy-design.md](specs/pedagogy-design.md)** — Parcours utilisateur, 10 templates de lecons, gamification, accessibilite. *(si genere par l'agent)*
+- **[widget-system-spec.md](specs/widgets/widget-system-spec.md)** — Widget architecture. Taxonomy (LEAF/COMPOSED), composition, lifecycle, 8 detailed examples.
+- **[widget-catalog.md](specs/widgets/widget-catalog.md)** — Catalog of 41 types. JSON schema, settings modal, providers, scoring, constraints per type.
+- **[audio-podcast-spec.md](specs/widgets/audio-podcast-spec.md)** — Voice podcast generation (2-voice script + TTS segmentation).
+- **[video-generation-spec.md](specs/widgets/video-generation-spec.md)** — Storyboard slideshow (script + per-slide narration).
+- **[infographic-spec.md](specs/widgets/infographic-spec.md)** — Infographic generation pipeline.
 
-### Architecture technique
-- **[specs/realtime-architecture.md](specs/realtime-architecture.md)** — Redis pub/sub + SSE + BullMQ. Events, queues, workers. Regle : pas de polling.
-- **[specs/api-reference.md](specs/api-reference.md)** — API Studio (~50 endpoints internes). Schemas Zod.
-- **[specs/generative-api.md](specs/generative-api.md)** — API Generative (publique, stateless). Endpoints pedagogiques, API keys, webhooks, batch.
-- **[specs/providers.md](specs/providers.md)** — 24 AI providers (image, audio, video). BYOK, pricing, settings UI.
-- **[specs/ontology.md](specs/ontology.md)** — Primitives universelles (Phase 3+). Player generique, compilation, custom widgets.
+### Architecture
 
-### Institutionnel
-- **[specs/multi-tenant.md](specs/multi-tenant.md)** — Organisation, Workspace, roles (5 niveaux). Widget activation par tenant. Data isolation.
-- **[specs/privacy-compliance.md](specs/privacy-compliance.md)** — RGPD, donnees mineurs, souverainete, securite technique, DPA, conformite Education Nationale.
+- **[data-model.md](specs/architecture/data-model.md)** — Full Prisma schema (20+ tables, enums, relations). Missing tables identified.
+- **[api-reference.md](specs/architecture/api-reference.md)** — Studio API (~55 internal endpoints). Zod schemas.
+- **[realtime-architecture.md](specs/architecture/realtime-architecture.md)** — Redis pub/sub + SSE + BullMQ. Events, queues, workers. Rule: no polling.
+- **[lifecycle.md](specs/architecture/lifecycle.md)** — Widget creation (chat, modal, manual) and playback (states, self-paced, sharing, result tracking).
+- **[ontology.md](specs/architecture/ontology.md)** — Universal primitives (Phase 3+). Generic player, compilation, custom widgets.
+- **[chat-architecture-research.md](specs/architecture/chat-architecture-research.md)** — Intelligent chat system design research.
 
-### Distribution
-- **[specs/interoperability.md](specs/interoperability.md)** — JSON Schema, npm packages, CLI, MCP server, llms.txt, xAPI/LTI.
-- **[specs/open-source-plan.md](specs/open-source-plan.md)** — Repo, Docker, docs, community, communication, CI/CD, monetisation.
+### AI
+
+- **[chat-intelligent.md](specs/ai/chat-intelligent.md)** — Unified LLM agent architecture, tool generation, mentions, citations.
+- **[generative-api.md](specs/ai/generative-api.md)** — Public generative API (stateless endpoints, API keys, webhooks, batch).
+- **[rag-analysis.md](specs/ai/rag-analysis.md)** — RAG pipeline analysis.
+- **[rag-advanced.md](specs/ai/rag-advanced.md)** — Advanced retrieval patterns (HyDE, contextual embeddings, reranking).
+
+### Pedagogy
+
+- **[glossary.md](specs/pedagogy/glossary.md)** — Canonical definitions. FR/EN terms, pedagogical hierarchy, roles. Read first.
+- **[pedagogical-structure.md](specs/pedagogy/pedagogical-structure.md)** — LMD + secondary + vocational hierarchies. 3 locales (fr-lmd, fr-secondary, fr-pro).
+- **[pedagogy-design.md](specs/pedagogy/pedagogy-design.md)** — Learner journey, 10 lesson templates, gamification, accessibility.
+
+### Governance
+
+- **[multi-tenant.md](specs/governance/multi-tenant.md)** — Organization, Workspace, roles (5 levels). Widget activation per tenant. Data isolation.
+- **[privacy-compliance.md](specs/governance/privacy-compliance.md)** — GDPR, minor data, sovereignty, security, DPA, Education Nationale compliance.
+
+### Integration
+
+- **[providers.md](specs/integration/providers.md)** — 24 AI providers (image, audio, video). BYOK, pricing, settings UI.
+- **[interoperability.md](specs/integration/interoperability.md)** — JSON Schema, npm packages, CLI, MCP server, llms.txt, xAPI/LTI.
+- **[open-source-plan.md](specs/integration/open-source-plan.md)** — Repo, Docker, docs, community, CI/CD, monetization.
 
 ---
 
-## Current (realite)
+## Current (actual state)
 
-L'etat reel du code. Ce qui fonctionne, ce qui manque, et les ecarts avec les specs.
+The actual state of the code. What works, what's missing, and gaps with specs.
 
-- **[current/implementation-status.md](current/implementation-status.md)** — Status d'implementation complet. 12/41 types, gap analysis, terminologie spec vs code.
+- **[current/implementation-status.md](current/implementation-status.md)** — Full implementation status. 28/41 types built, gap analysis.
 
 ---
 
@@ -70,9 +89,9 @@ L'etat reel du code. Ce qui fonctionne, ce qui manque, et les ecarts avec les sp
 
 ## Prompts
 
-- [prompts/](prompts/) — Prompts LLM pour les workflows Mastra
+- [prompts/](prompts/) — LLM prompts for Mastra generation workflows
 
 ## Archived
 
-- [archived/old-specs/](archived/old-specs/) — Anciennes specs WPS++ (remplacees)
-- [archived/reference/](archived/reference/) — Benchmarks et analyses
+- [archived/old-specs/](archived/old-specs/) — Legacy WPS++ specs (superseded)
+- [archived/reference/](archived/reference/) — Benchmarks and research analyses

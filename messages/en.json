@@ -8,10 +8,9 @@
     "getStarted": "Get Started"
   },
   "hero": {
-    "badge": "Open Source \u00b7 AI-powered",
-    "notebookBadge": "The open-source alternative to NotebookLM",
-    "title": "Transform documents into interactive components",
-    "subtitle": "Upload any document. AI generates quizzes, presentations, podcasts, mind maps, reports, and more. Open source, self-hostable, API-first.",
+    "badge": "Open-source NotebookLM alternative",
+    "title": "Turn any document into learning experiences",
+    "subtitle": "Like NotebookLM, but open source and LLM-agnostic. Upload PDFs, URLs, or Drive files \u2014 generate podcasts, quizzes, summaries, flashcards, presentations, and 20+ formats. Self-host with your own AI keys.",
     "cta": "Get started free",
     "github": "View on GitHub"
   },
@@ -28,7 +27,7 @@
   },
   "widgets": {
     "title": "Widget catalog",
-    "subtitle": "Generate interactive and static components from your content.",
+    "subtitle": "28 formats across interactive, static, media, and pedagogical categories.",
     "filterAll": "All",
     "filterInteractive": "Interactive",
     "filterStatic": "Static",
@@ -37,11 +36,11 @@
   },
   "howItWorks": {
     "title": "How it works",
-    "subtitle": "Three steps from document to interactive component.",
+    "subtitle": "Three steps from document to learning content.",
     "step1Title": "Upload",
     "step1Desc": "Import documents: PDF, DOCX, web pages, YouTube, PowerPoint.",
     "step2Title": "Generate",
-    "step2Desc": "Chat with AI or use the API to create interactive components.",
+    "step2Desc": "Chat with AI or use the API to generate quizzes, podcasts, summaries, and more.",
     "step3Title": "Share & Play",
     "step3Desc": "Self-paced, live sessions via Qiplim, embed, or export."
   },

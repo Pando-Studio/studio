@@ -8,10 +8,9 @@
     "getStarted": "Commencer"
   },
   "hero": {
-    "badge": "Open Source \u00b7 Propulse par l'IA",
-    "notebookBadge": "L'alternative open source a NotebookLM",
-    "title": "Transformez vos documents en composants interactifs",
-    "subtitle": "Importez n'importe quel document. L'IA genere des quiz, presentations, podcasts, cartes mentales, rapports, et bien plus. Open source, auto-hebergeable, API-first.",
+    "badge": "Alternative open source a NotebookLM",
+    "title": "Transformez vos documents en experiences d'apprentissage",
+    "subtitle": "Comme NotebookLM, mais open source et agnostique en LLM. Importez des PDF, URL ou fichiers Drive \u2014 generez des podcasts, quiz, resumes, flashcards, presentations, et 20+ formats. Auto-hebergeable avec vos propres cles IA.",
     "cta": "Commencer gratuitement",
     "github": "Voir sur GitHub"
   },
@@ -28,7 +27,7 @@
   },
   "widgets": {
     "title": "Catalogue de widgets",
-    "subtitle": "Generez des composants interactifs et statiques a partir de vos contenus.",
+    "subtitle": "28 formats : interactifs, statiques, media et pedagogiques.",
     "filterAll": "Tous",
     "filterInteractive": "Interactifs",
     "filterStatic": "Statiques",
@@ -37,11 +36,11 @@
   },
   "howItWorks": {
     "title": "Comment ca marche",
-    "subtitle": "Trois etapes du document au composant interactif.",
+    "subtitle": "Trois etapes du document au contenu d'apprentissage.",
     "step1Title": "Importez",
     "step1Desc": "Importez vos documents : PDF, DOCX, pages web, YouTube, PowerPoint.",
     "step2Title": "Generez",
-    "step2Desc": "Discutez avec l'IA ou utilisez l'API pour creer des composants interactifs.",
+    "step2Desc": "Discutez avec l'IA ou utilisez l'API pour generer des quiz, podcasts, resumes, et plus.",
     "step3Title": "Partagez & Jouez",
     "step3Desc": "En autonomie, sessions live via Qiplim, embarquez ou exportez."
   },

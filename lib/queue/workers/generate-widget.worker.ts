@@ -194,7 +194,72 @@ async function processJob(
       }
     }
 
-    // Step 4: Finalizing — validation + save
+    // Step 5: Video assembly (slideshow mode) — render slides + audio into MP4
+    const assemblyCheck = {
+      isVideoGeneration,
+      hasScript: !!generatedData.script,
+      slideCount: (generatedData.script as { slides?: unknown[] })?.slides?.length,
+    };
+    logger.info('Video assembly check', { runId, ...assemblyCheck });
+    // Persist check to DB for debugging (will be overwritten by final metadata)
+    await prisma.generationRun.update({
+      where: { id: runId },
+      data: { errorLog: `assembly_check: ${JSON.stringify(assemblyCheck)}` },
+    });
+    if (isVideoGeneration && generatedData.script) {
+      const slides = (generatedData.script as { slides: Array<Record<string, unknown>> }).slides;
+      const hasAudio = slides.some((s) => s.audioUrl);
+      logger.info('Video assembly audio check', { runId, hasAudio, slidesWithAudio: slides.filter(s => s.audioUrl).length });
+      if (hasAudio) {
+        try {
+          logger.generation('Assembling video with Remotion', { runId, slideCount: slides.length });
+          await updateRunProgress(runId, studioId, {
+            step: 'assembling',
+            label: 'Assemblage de la video...',
+            progress: 80,
+          });
+
+          const { renderSlideshowVideo } = await import('../../video/render');
+          const { uploadToS3, generateS3Key } = await import('../../s3');
+
+          const renderResult = await renderSlideshowVideo(
+            slides as unknown as Parameters<typeof renderSlideshowVideo>[0],
+          );
+
+          // Upload video
+          const videoKey = generateS3Key(`video-${Date.now()}.mp4`, studioId);
+          const videoUpload = await uploadToS3(renderResult.videoBuffer, videoKey, 'video/mp4');
+          generatedData.videoUrl = videoUpload.url;
+
+          // Upload thumbnail
+          const thumbKey = generateS3Key(`thumb-${Date.now()}.jpg`, studioId);
+          const thumbUpload = await uploadToS3(renderResult.thumbnailBuffer, thumbKey, 'image/jpeg');
+          generatedData.thumbnailUrl = thumbUpload.url;
+
+          // Update duration with exact render duration
+          generatedData.duration = Math.round(renderResult.durationSeconds);
+
+          logger.generation('Video assembled', {
+            runId,
+            duration: renderResult.durationSeconds,
+            videoSize: renderResult.videoBuffer.length,
+          });
+        } catch (renderError) {
+          // Render failure is non-fatal: storyboard + audio still saved
+          // Persist error in generation run metadata for debugging
+          await prisma.generationRun.update({
+            where: { id: runId },
+            data: { errorLog: `Video assembly failed: ${renderError instanceof Error ? renderError.message : String(renderError)}` },
+          });
+          logger.warn('Video assembly failed, storyboard with audio saved', {
+            runId,
+            error: renderError instanceof Error ? renderError.message : String(renderError),
+          });
+        }
+      }
+    }
+
+    // Step 6: Finalizing — validation + save
     await job.updateProgress(STEPS.FINALIZING);
     await updateRunProgress(runId, studioId, STEPS.FINALIZING);
 

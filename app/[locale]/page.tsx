@@ -217,7 +217,7 @@ export default function HomePage() {
     { label: t('nav.openSource'), href: '#open-source' },
     {
       label: t('nav.github'),
-      href: 'https://github.com/pando-studio/qiplim',
+      href: 'https://github.com/Qiplim/studio',
       external: true,
     },
   ] as const;
@@ -438,7 +438,7 @@ export default function HomePage() {
               </Button>
             </a>
             <a
-              href="https://github.com/pando-studio/qiplim"
+              href="https://github.com/Qiplim/studio"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -718,7 +718,7 @@ export default function HomePage() {
 
           <div className="text-center animate-fade-up animation-delay-450">
             <a
-              href="https://github.com/pando-studio/qiplim"
+              href="https://github.com/Qiplim/studio"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -769,7 +769,7 @@ export default function HomePage() {
             {/* Links */}
             <nav className="flex items-center gap-6 text-sm font-display font-medium text-muted-foreground">
               <a
-                href="https://github.com/pando-studio/qiplim"
+                href="https://github.com/Qiplim/studio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-landing-text transition-colors"
@@ -796,13 +796,29 @@ export default function HomePage() {
               >
                 {t('footer.api')}
               </Link>
+              <a
+                href="https://qiplim.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-landing-text transition-colors"
+              >
+                Qiplim
+              </a>
+              <a
+                href="https://pando-studio.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-landing-text transition-colors"
+              >
+                Pando Studio
+              </a>
             </nav>
 
             {/* Attribution */}
             <p className="text-sm text-muted-foreground">
               {t('footer.madeBy')}{' '}
               <a
-                href="https://pando-studio.fr"
+                href="https://pando-studio.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold hover:text-landing-brand transition-colors"

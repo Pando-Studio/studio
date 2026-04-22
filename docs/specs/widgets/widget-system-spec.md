@@ -2,26 +2,26 @@
 
 ## Context
 
-Studio est un créateur universel d'expériences interactives à partir de documents. L'objectif est de définir un système de widgets composables — statiques, interactifs, et génératifs — qui peuvent être créés via IA dans Studio et joués en session live dans Engage. Ce document spécifie l'architecture, le lifecycle, la composition, et les patterns de génération pour que le concept soit robuste, interopérable et open-source.
+Studio is a universal creator of interactive experiences from documents. The goal is to define a composable widget system — static, interactive, and generative — that can be created via AI in Studio and played in live sessions in Engage. This document specifies the architecture, lifecycle, composition, and generation patterns to make the concept robust, interoperable, and open-source.
 
-**Ce document remplace** les specs WPS++ précédentes qui étaient trop over-engineered (A2UI, capabilities runtime, 11 lifecycle hooks non implémentés). On part de **ce qui fonctionne** (Engage en prod) et on étend progressivement.
+**This document replaces** the previous WPS++ specs which were too over-engineered (A2UI, capabilities runtime, 11 unimplemented lifecycle hooks). We start from **what works** (Engage in prod) and extend progressively.
 
 ---
 
-## 1. Taxonomie des Widgets
+## 1. Widget Taxonomy
 
-### 1.1 Quatre catégories
+### 1.1 Four categories
 
-| Catégorie | Description | Exemples | État runtime |
-|-----------|-------------|----------|-------------|
-| **Static simple** | Contenu généré, lecture seule | Audio podcast, image, vidéo, texte/MD | Aucun |
-| **Static composé** | Ensemble structuré de contenu statique | Plan de cours, slide deck, article structuré | Navigation (page courante) |
-| **Interactif** | Widget avec input participant + scoring | Quiz, QCM, wordcloud, post-it, ranking, roleplay, opentext | State machine (idle→active→ended) + responses |
-| **Interactif composé** | Séquence orchestrée de widgets | Présentation (slides + quiz), formation complète, aventure interactive | Orchestration (séquentiel, conditionnel) |
+| Category | Description | Examples | Runtime state |
+|----------|-------------|----------|---------------|
+| **Static simple** | Generated content, read-only | Audio podcast, image, video, text/MD | None |
+| **Static composed** | Structured set of static content | Course plan, slide deck, structured article | Navigation (current page) |
+| **Interactive** | Widget with participant input + scoring | Quiz, MCQ, wordcloud, post-it, ranking, roleplay, opentext | State machine (idle→active→ended) + responses |
+| **Interactive composed** | Orchestrated sequence of widgets | Presentation (slides + quiz), complete training, interactive adventure | Orchestration (sequential, conditional) |
 
-### 1.2 Le bloc GENERATIVE
+### 1.2 The GENERATIVE block
 
-Un type transversal : un bloc dont le **contenu est généré at runtime** par un LLM, en fonction du contexte de la session (votes, réponses, progression). N'importe quel type de widget peut avoir une couche générative.
+A cross-cutting type: a block whose **content is generated at runtime** by an LLM, based on the session context (votes, responses, progression). Any widget type can have a generative layer.
 
 ```typescript
 interface GenerativeConfig {
@@ -32,22 +32,22 @@ interface GenerativeConfig {
 }
 ```
 
-**Exemples d'usage** :
-- Chapitre suivant d'une aventure (input: résultat du vote collectif)
-- Feedback personnalisé post-quiz (input: score + erreurs fréquentes)
-- Question de relance adaptée au niveau (input: % de bonnes réponses du groupe)
-- Options de vote dynamiques (input: contexte narratif généré)
+**Usage examples**:
+- Next chapter of an adventure (input: collective vote result)
+- Personalized post-quiz feedback (input: score + frequent errors)
+- Adaptive follow-up question based on level (input: % of correct group answers)
+- Dynamic vote options (input: generated narrative context)
 
 ---
 
-## 2. Architecture Widget
+## 2. Widget Architecture
 
 ### 2.1 Widget = JSON Spec + Schema + Renderer
 
-Chaque widget est défini par trois éléments :
-1. **Spec JSON** (`data`) — structure + contenu, stocké en DB
-2. **Schema Zod** — validation de la spec à l'écriture et à la lecture
-3. **Renderer(s)** — composants React pour l'affichage selon le contexte
+Each widget is defined by three elements:
+1. **JSON Spec** (`data`) — structure + content, stored in DB
+2. **Zod Schema** — spec validation at write and read time
+3. **Renderer(s)** — React components for display depending on context
 
 ```typescript
 interface Widget {
@@ -62,9 +62,9 @@ interface Widget {
 }
 ```
 
-### 2.2 Modèle de composition simplifié
+### 2.2 Simplified composition model
 
-Un composé = une **liste ordonnée d'enfants** + des **règles de navigation**.
+A composed widget = an **ordered list of children** + **navigation rules**.
 
 ```typescript
 interface ComposedWidget extends Widget {
@@ -83,26 +83,26 @@ interface Transition {
 }
 ```
 
-**Mode séquentiel** : les enfants sont joués dans l'ordre. `transitions` est optionnel (auto-advance).
+**Sequential mode**: children are played in order. `transitions` is optional (auto-advance).
 
-**Mode conditionnel** : les `transitions` définissent quel enfant vient après quel autre, selon une condition évaluée sur le résultat du step précédent.
+**Conditional mode**: `transitions` define which child comes after which, based on a condition evaluated on the result of the previous step.
 
-### 2.3 LEAF avec parentId — generation en cascade
+### 2.3 LEAF with parentId — cascading generation
 
-Un widget LEAF peut avoir des **enfants** via `parentId`, sans devenir COMPOSED. C'est le modele retenu pour les widgets pedagogiques et les widgets "riches" (rapport, resume, etc.).
+A LEAF widget can have **children** via `parentId`, without becoming COMPOSED. This is the chosen model for pedagogical widgets and "rich" widgets (report, summary, etc.).
 
-**Semantique du `kind`** :
+**Semantics of `kind`**:
 
-| Kind | Contenu propre (`data`) | Enfants (`children`) | Usage |
-|------|------------------------|---------------------|-------|
-| `LEAF` | Oui (contenu genere, Markdown, items, etc.) | Optionnel — via `parentId` | Quiz, FAQ, Rapport, Syllabus, Semester, etc. |
-| `COMPOSED` | Non (juste orchestration) | Oui — navigation entre enfants | Sequence, Module de cours |
+| Kind | Own content (`data`) | Children (`children`) | Usage |
+|------|---------------------|----------------------|-------|
+| `LEAF` | Yes (generated content, Markdown, items, etc.) | Optional — via `parentId` | Quiz, FAQ, Report, Syllabus, Semester, etc. |
+| `COMPOSED` | No (orchestration only) | Yes — navigation between children | Sequence, Course Module |
 
-Un `LEAF` avec enfants a **deux vues** dans l'UI :
-1. **Vue contenu** (defaut) — affiche son propre contenu (Markdown, items, questions)
-2. **Vue enfants** (onglet ou section) — liste les widgets generes a partir de ce contenu
+A `LEAF` with children has **two views** in the UI:
+1. **Content view** (default) — displays its own content (Markdown, items, questions)
+2. **Children view** (tab or section) — lists the widgets generated from this content
 
-**Exemple : generation pedagogique en cascade**
+**Example: cascading pedagogical generation**
 
 ```
 [PROGRAM_OVERVIEW] LEAF, content: "# Master UX Design..."
@@ -114,20 +114,20 @@ Un `LEAF` avec enfants a **deux vues** dans l'UI :
    └── [SEMESTER] LEAF, parentId: program.id, content: "# S2 — Approfondissement..."
 ```
 
-Chaque widget est **autonome** : il a son propre contenu et peut etre genere/consulte independamment. Le lien `parentId` est optionnel et sert a :
-- Afficher l'arborescence dans l'UI
-- Fournir le contexte parent lors de la generation en cascade
-- Naviguer entre niveaux (breadcrumb)
+Each widget is **autonomous**: it has its own content and can be generated/viewed independently. The `parentId` link is optional and serves to:
+- Display the tree structure in the UI
+- Provide parent context during cascading generation
+- Navigate between levels (breadcrumb)
 
-**Le `content` Markdown comme source de generation** :
+**Markdown `content` as a generation source**:
 
-> **Piste de reflexion (non implementee)** : les widgets dont `data.content` (Markdown) existe pourraient servir de source contextuelle pour generer des sous-widgets. Le `content` d'un SEMESTER pourrait etre parse (headings = UE potentielles) ou utilise comme contexte RAG pour generer des SYLLABUS enfants. De meme, un REPORT pourrait alimenter la generation de QUIZ, FLASHCARD, ou GLOSSARY. Le `content` Markdown serait le **pont universel** entre widgets — tout widget "riche" peut devenir source pour d'autres.
+> **Design consideration (not implemented)**: widgets whose `data.content` (Markdown) exists could serve as a contextual source for generating sub-widgets. A SEMESTER's `content` could be parsed (headings = potential course units) or used as RAG context to generate child SYLLABUS widgets. Similarly, a REPORT could feed the generation of QUIZ, FLASHCARD, or GLOSSARY. The Markdown `content` would be the **universal bridge** between widgets — any "rich" widget can become a source for others.
 >
-> Cette abstraction n'est pas necessaire en Phase 1 mais ouvre la voie a un systeme ou tout widget est potentiellement generateur, pas seulement les types pedagogiques.
+> This abstraction is not needed in Phase 1 but paves the way for a system where any widget is potentially a generator, not just pedagogical types.
 
-### 2.4 Registry de types
+### 2.4 Type registry
 
-Chaque type de widget est enregistré dans un registry central :
+Each widget type is registered in a central registry:
 
 ```typescript
 interface WidgetTypeDefinition {
@@ -148,13 +148,13 @@ interface WidgetTypeDefinition {
 }
 ```
 
-Le registry permet d'ajouter de nouveaux types de widgets sans modifier le core. Un nouveau type = un schema + des renderers + un enregistrement.
+The registry allows adding new widget types without modifying the core. A new type = a schema + renderers + a registration entry.
 
 ---
 
 ## 3. Lifecycle
 
-### 3.1 Lifecycle dans Studio (création)
+### 3.1 Lifecycle in Studio (creation)
 
 ```
 Document(s) upload
@@ -164,22 +164,22 @@ Document(s) upload
   → Widget(DRAFT)
   → User review / edit
   → Widget(READY)
-  → Compose (optionnel: grouper en séquence)
+  → Compose (optional: group into sequence)
   → Deploy to Engage
 ```
 
-**États** : `DRAFT` → `GENERATING` → `READY` | `ERROR`
+**States**: `DRAFT` → `GENERATING` → `READY` | `ERROR`
 
-**Communication temps réel** : Redis pub/sub → SSE endpoint → `useStudioEvents()` hook qui invalide les queries TanStack Query. Pas de polling.
+**Real-time communication**: Redis pub/sub → SSE endpoint → `useStudioEvents()` hook that invalidates TanStack Query queries. No polling.
 
-**Events** :
-- `source:status` — changement de status d'indexation (PENDING → INDEXING → INDEXED → ERROR)
-- `generation:progress` — progression du workflow de génération (step + pourcentage)
-- `generation:complete` — fin de génération (succès ou échec)
+**Events**:
+- `source:status` — indexing status change (PENDING → INDEXING → INDEXED → ERROR)
+- `generation:progress` — generation workflow progress (step + percentage)
+- `generation:complete` — generation complete (success or failure)
 
-### 3.2 Lifecycle dans Engage (exécution interactive)
+### 3.2 Lifecycle in Engage (interactive execution)
 
-Pour les widgets **interactifs** joués en session live :
+For **interactive** widgets played in live sessions:
 
 ```
 IDLE → PREVIEW → ACTIVE → ENDED
@@ -192,52 +192,52 @@ IDLE → PREVIEW → ACTIVE → ENDED
   └── Presenter controls all transitions
 ```
 
-**Trois états primaires** (ActivityState) :
-- **PENDING** : l'activité existe mais n'a pas démarré. Le présentateur peut la preview.
-- **ACTIVE** : l'activité est live. Les participants peuvent soumettre des réponses. Le présentateur voit les résultats en temps réel.
-- **ENDED** : l'activité est fermée. Les résultats finaux sont calculés et mis en cache.
+**Three primary states** (ActivityState):
+- **PENDING**: the activity exists but has not started. The presenter can preview it.
+- **ACTIVE**: the activity is live. Participants can submit responses. The presenter sees results in real time.
+- **ENDED**: the activity is closed. Final results are computed and cached.
 
-**Channels Ably** (temps réel) :
-- `session:{id}` — events publics : `activity:started`, `activity:ended`, `timer_sync`, `quiz:question_started`, `quiz:results_revealed`
-- `session:{id}:presenter` — events présentateur : `response_received` (compteur), `results_updated` (agrégation)
+**Ably channels** (real-time):
+- `session:{id}` — public events: `activity:started`, `activity:ended`, `timer_sync`, `quiz:question_started`, `quiz:results_revealed`
+- `session:{id}:presenter` — presenter events: `response_received` (counter), `results_updated` (aggregation)
 
-**Submission flow** (participant → serveur) :
+**Submission flow** (participant → server):
 1. `POST /api/sessions/{id}/activities/{activityId}/{type}/submit`
-2. Validation Zod du payload → vérification de doublon → upsert atomique (Prisma tx)
-3. Retour 201 immédiat
-4. Fire-and-forget asynchrone :
-   - Incrément du compteur de réponses (Redis)
-   - Publication `response_received` (Ably, présentateur)
-   - Agrégation throttlée (500ms) → cache Redis → publication `results_updated`
+2. Zod payload validation → duplicate check → atomic upsert (Prisma tx)
+3. Immediate 201 response
+4. Asynchronous fire-and-forget:
+   - Response counter increment (Redis)
+   - `response_received` publication (Ably, presenter)
+   - Throttled aggregation (500ms) → Redis cache → `results_updated` publication
 
-**Quiz : lifecycle per-question** :
+**Quiz: per-question lifecycle**:
 ```
 Question PENDING → ACTIVE (presenter starts) → ENDED (presenter ends)
   → REVEAL (results shown to participants) → Next question
 ```
-Chaque question a son propre état, timer, et résultats. Le quiz est un state machine imbriqué.
+Each question has its own state, timer, and results. The quiz is a nested state machine.
 
-### 3.3 Lifecycle des blocs GENERATIVE
+### 3.3 GENERATIVE block lifecycle
 
-Quand un bloc génératif est atteint dans la séquence :
+When a generative block is reached in the sequence:
 
 ```
-Bloc atteint dans la séquence
-  → Collecte des inputBindings (résultats des blocs précédents)
-  → Affichage loading ("Génération en cours...")
-  → Appel LLM (clé plateforme Qiplim) avec promptTemplate + inputs
-  → Validation outputSchema
-  → Rendu du contenu généré
-  → Continue la séquence
+Block reached in the sequence
+  → Collect inputBindings (results from previous blocks)
+  → Display loading ("Generation in progress...")
+  → LLM call (Qiplim platform key) with promptTemplate + inputs
+  → outputSchema validation
+  → Render generated content
+  → Continue the sequence
 ```
 
-**Config LLM** : clé plateforme Qiplim. Les utilisateurs ne gèrent pas de clé côté Engage. Un système de quota par session limite les abus (ex: max 20 appels LLM par session).
+**LLM config**: Qiplim platform key. Users do not manage keys on the Engage side. A per-session quota system limits abuse (e.g., max 20 LLM calls per session).
 
-**Fallback** : si le LLM échoue (timeout, quota, erreur), afficher le `fallback` content. Si pas de fallback, message d'erreur graceful avec option "Réessayer".
+**Fallback**: if the LLM fails (timeout, quota, error), display the `fallback` content. If no fallback, graceful error message with a "Retry" option.
 
-### 3.4 Lifecycle des compositions
+### 3.4 Composition lifecycle
 
-Pour les widgets **composés** en session live :
+For **composed** widgets in live sessions:
 
 ```
 Composition loaded
@@ -250,15 +250,15 @@ Composition loaded
   → Last step ends → composition ENDED
 ```
 
-Le **présentateur** contrôle la progression. Il peut :
-- Avancer au step suivant
-- Revenir au step précédent (si mode sequential)
-- Forcer une transition (bypass les conditions)
-- Voir la progression globale (current / total steps)
+The **presenter** controls progression. They can:
+- Advance to the next step
+- Go back to the previous step (if sequential mode)
+- Force a transition (bypass conditions)
+- View overall progress (current / total steps)
 
 ---
 
-## 4. Exemples détaillés
+## 4. Detailed Examples
 
 ### 4.1 Audio Podcast (static simple)
 
@@ -280,17 +280,17 @@ Le **présentateur** contrôle la progression. Il peut :
 }
 ```
 
-**Génération dans Studio** :
-1. Document → RAG retrieval des points clés
-2. LLM écrit le script audio (ton conversationnel, ~3 min)
-3. TTS (Voxtral, ElevenLabs, ou Google TTS) → fichier audio
-4. Upload vers S3 → URL audio dans le widget
+**Generation in Studio**:
+1. Document → RAG retrieval of key points
+2. LLM writes the audio script (conversational tone, ~3 min)
+3. TTS (Voxtral, ElevenLabs, or Google TTS) → audio file
+4. Upload to S3 → audio URL in the widget
 
-**Rendu** : Player audio avec transcript synchronisé (surlignage du texte en cours)
+**Rendering**: Audio player with synchronized transcript (highlighting text as it plays)
 
-**Export Engage** : Jouable en session comme slide avec audio auto-play. Pas d'interaction participant.
+**Engage export**: Playable in session as a slide with audio auto-play. No participant interaction.
 
-### 4.2 Quiz interactif (interactif)
+### 4.2 Interactive quiz (interactive)
 
 ```json
 {
@@ -331,14 +331,14 @@ Le **présentateur** contrôle la progression. Il peut :
 }
 ```
 
-**Génération** : Document → RAG retrieval → LLM génère N questions avec options et explications → Validation Zod (min 2 options, exactement 1 isCorrect pour type single)
+**Generation**: Document → RAG retrieval → LLM generates N questions with options and explanations → Zod validation (min 2 options, exactly 1 isCorrect for single type)
 
-**Lifecycle Engage** :
-- Per-question : PENDING → ACTIVE (question affichée) → ENDED (timer ou presenter) → REVEAL (résultats visibles)
-- Scoring : points par question, temps de réponse optionnel
-- Leaderboard temps réel via Ably
+**Engage lifecycle**:
+- Per-question: PENDING → ACTIVE (question displayed) → ENDED (timer or presenter) → REVEAL (results visible)
+- Scoring: points per question, optional response time
+- Real-time leaderboard via Ably
 
-### 4.3 Plan de cours structuré (static composé)
+### 4.3 Structured course plan (static composed)
 
 ```json
 {
@@ -386,10 +386,10 @@ Le **présentateur** contrôle la progression. Il peut :
 }
 ```
 
-**Génération** : Document(s) → LLM structure le contenu en modules cohérents → chaque module est un enfant
-**Export** : Markdown structuré, PDF, ou page web statique
+**Generation**: Document(s) → LLM structures the content into coherent modules → each module is a child
+**Export**: Structured Markdown, PDF, or static web page
 
-### 4.4 Présentation interactive (interactif composé)
+### 4.4 Interactive presentation (interactive composed)
 
 ```json
 {
@@ -442,9 +442,9 @@ Le **présentateur** contrôle la progression. Il peut :
 }
 ```
 
-**Lifecycle Engage** : Le présentateur navigue séquentiellement. Les slides sont affichées passivement. Quand un widget interactif (QCM, quiz) est atteint, il passe en mode ACTIVE — les participants interagissent. Le présentateur voit les résultats en temps réel, puis avance à la slide suivante.
+**Engage lifecycle**: The presenter navigates sequentially. Slides are displayed passively. When an interactive widget (MCQ, quiz) is reached, it switches to ACTIVE mode — participants interact. The presenter sees real-time results, then advances to the next slide.
 
-### 4.5 Aventure interactive "Livre dont on est le héros" (interactif composé + génératif)
+### 4.5 Interactive adventure "Choose your own adventure" (interactive composed + generative)
 
 ```json
 {
@@ -532,19 +532,19 @@ Le **présentateur** contrôle la progression. Il peut :
 }
 ```
 
-**Flow en session live** :
-1. Le présentateur lance le chapitre 1 → affiché à tous les participants
-2. Le vote s'ouvre → participants votent en temps réel → résultats agrégés via Ably
-3. Le présentateur avance → le bloc `GENERATIVE_TEXT` est détecté
-4. **Loading** : "Génération du chapitre suivant..." (spinner visible à tous)
-5. Le serveur Engage appelle le LLM avec le résultat du vote injecté dans le prompt
-6. Le chapitre 2 s'affiche → les participants découvrent la suite ensemble
-7. Le vote 2 est aussi génératif : ses options sont créées par le LLM à partir du chapitre
-8. Même flow pour le chapitre 3 (épilogue)
+**Live session flow**:
+1. The presenter launches chapter 1 → displayed to all participants
+2. The vote opens → participants vote in real time → results aggregated via Ably
+3. The presenter advances → the `GENERATIVE_TEXT` block is detected
+4. **Loading**: "Generating the next chapter..." (spinner visible to all)
+5. The Engage server calls the LLM with the vote result injected into the prompt
+6. Chapter 2 is displayed → participants discover the continuation together
+7. Vote 2 is also generative: its options are created by the LLM from the chapter
+8. Same flow for chapter 3 (epilogue)
 
-**Ce qui est fondamental** : le LLM est appelé **pendant** la session, pas avant. L'expérience est co-créée par les participants (via leurs votes) et l'IA (via la narration).
+**What is fundamental**: the LLM is called **during** the session, not before. The experience is co-created by the participants (via their votes) and the AI (via the narration).
 
-### 4.6 Simulation de crise (interactif composé + conditionnel)
+### 4.6 Crisis simulation (interactive composed + conditional)
 
 ```json
 {
@@ -615,9 +615,9 @@ Le **présentateur** contrôle la progression. Il peut :
 }
 ```
 
-**Flow** : Après le vote collectif, le moteur évalue quelle transition prendre. Si la majorité a voté "Isoler le serveur" (`winningOptionId == 'isolate'`), on va vers `good-path`. Sinon, `bad-path`. Dans les deux cas, on finit par le quiz de debrief.
+**Flow**: After the collective vote, the engine evaluates which transition to take. If the majority voted "Isolate the server" (`winningOptionId == 'isolate'`), it goes to `good-path`. Otherwise, `bad-path`. In both cases, it ends with the debrief quiz.
 
-### 4.7 Ice-breaker rapide (template composé)
+### 4.7 Quick ice-breaker (composed template)
 
 ```json
 {
@@ -657,9 +657,9 @@ Le **présentateur** contrôle la progression. Il peut :
 }
 ```
 
-**Usage** : Template prêt à l'emploi, personnalisable. L'utilisateur dans Studio dit "Crée un ice-breaker pour une formation en management" → le LLM adapte les prompts et les items au contexte.
+**Usage**: Ready-to-use template, customizable. The user in Studio says "Create an ice-breaker for a management training" → the LLM adapts the prompts and items to the context.
 
-### 4.8 Formation complète avec score-gating (interactif composé + conditionnel + génératif)
+### 4.8 Complete training with score-gating (interactive composed + conditional + generative)
 
 ```json
 {
@@ -722,13 +722,13 @@ Le **présentateur** contrôle la progression. Il peut :
 }
 ```
 
-**Flow** : Après le quiz, si le score moyen du groupe est >= 70%, on affiche "Bravo". Sinon, le bloc GENERATIVE crée un feedback personnalisé basé sur les erreurs, puis redirige vers le quiz pour un second essai.
+**Flow**: After the quiz, if the group's average score is >= 70%, "Bravo" is displayed. Otherwise, the GENERATIVE block creates personalized feedback based on the errors, then redirects to the quiz for a second attempt.
 
 ---
 
-## 5. Génération par IA
+## 5. AI Generation
 
-### 5.1 Pipeline de génération (Studio)
+### 5.1 Generation pipeline (Studio)
 
 ```
 Document(s) upload → Parse (Unstructured.io) → Chunk → Embed (Mistral)
@@ -743,38 +743,38 @@ Chat mode "Créer" → LLM analyse la demande
   → Widget(DRAFT) → Preview → User confirm → Widget(READY)
 ```
 
-### 5.2 Comment le LLM choisit et construit
+### 5.2 How the LLM selects and builds
 
-Le chat en mode "Créer" a accès à des **tools** qui correspondent aux types de widgets :
+The chat in "Create" mode has access to **tools** that correspond to widget types:
 
-| Demande utilisateur | Tool sélectionné | Output |
-|---------------------|-----------------|--------|
-| "Fais un quiz" | `generateQuiz` | QUIZ (LEAF) |
-| "Crée un nuage de mots" | `generateWordcloud` | WORDCLOUD (LEAF) |
-| "Fais une présentation interactive" | `generateComposed` | PRESENTATION (COMPOSED) avec SLIDE + QUIZ children |
-| "Crée une aventure interactive" | `generateComposed` | ADVENTURE (COMPOSED) avec SLIDE + VOTE + GENERATIVE children |
-| "Résume en podcast" | `generateAudio` | AUDIO (LEAF) — script + TTS |
-| "Crée un ice-breaker" | `generateComposed` (template) | ICEBREAKER (COMPOSED) avec WORDCLOUD + POSTIT + RANKING |
+| User request | Tool selected | Output |
+|-------------|--------------|--------|
+| "Make a quiz" | `generateQuiz` | QUIZ (LEAF) |
+| "Create a word cloud" | `generateWordcloud` | WORDCLOUD (LEAF) |
+| "Make an interactive presentation" | `generateComposed` | PRESENTATION (COMPOSED) with SLIDE + QUIZ children |
+| "Create an interactive adventure" | `generateComposed` | ADVENTURE (COMPOSED) with SLIDE + VOTE + GENERATIVE children |
+| "Summarize as a podcast" | `generateAudio` | AUDIO (LEAF) — script + TTS |
+| "Create an ice-breaker" | `generateComposed` (template) | ICEBREAKER (COMPOSED) with WORDCLOUD + POSTIT + RANKING |
 
-### 5.3 Génération de compositions
+### 5.3 Composition generation
 
-Pour un composé, le LLM génère le **squelette complet** :
+For a composed widget, the LLM generates the **complete skeleton**:
 
-1. Détermine la structure (nombre d'enfants, types, orchestration mode)
-2. Génère le contenu des blocs statiques (slides, texte narratif)
-3. Configure les blocs interactifs (questions, options, scoring)
-4. Configure les blocs génératifs (prompt templates avec {{variables}}, input bindings)
-5. Définit les transitions (séquentielles ou conditionnelles)
+1. Determines the structure (number of children, types, orchestration mode)
+2. Generates the content for static blocks (slides, narrative text)
+3. Configures interactive blocks (questions, options, scoring)
+4. Configures generative blocks (prompt templates with {{variables}}, input bindings)
+5. Defines transitions (sequential or conditional)
 
-L'utilisateur peut ensuite éditer chaque bloc dans un **timeline editor** visuel.
+The user can then edit each block in a visual **timeline editor**.
 
 ---
 
-## 6. Export et Interopérabilité
+## 6. Export and Interoperability
 
-### 6.1 Format d'export : PlaybackPlan
+### 6.1 Export format: PlaybackPlan
 
-Le format d'échange entre Studio et Engage. Remplace le flatten actuel qui perd la hiérarchie.
+The exchange format between Studio and Engage. Replaces the current flatten which loses hierarchy.
 
 ```typescript
 interface PlaybackPlan {
@@ -805,16 +805,16 @@ interface PlaybackTransition {
 }
 ```
 
-### 6.2 Expressions de conditions
+### 6.2 Condition expressions
 
-Les conditions dans les transitions utilisent des **expressions simples** — pas de JSONPath ni JavaScript.
+Conditions in transitions use **simple expressions** — no JSONPath or JavaScript.
 
 ```
-Opérateurs : ==, !=, >=, <=, >, <, in
-Valeurs accessibles : propriétés plates du résultat du step précédent
-Types : string, number, boolean
+Operators: ==, !=, >=, <=, >, <, in
+Accessible values: flat properties from the previous step's result
+Types: string, number, boolean
 
-Exemples :
+Examples:
   "score >= 70"
   "winningOptionId == 'explore'"
   "responseCount > 10"
@@ -822,20 +822,20 @@ Exemples :
   "percentage >= 60"
 ```
 
-Évaluées par un parser minimaliste (~30 lignes). Faciles à générer par LLM, faciles à comprendre par l'utilisateur, faciles à auditer.
+Evaluated by a minimalist parser (~30 lines). Easy for LLMs to generate, easy for users to understand, easy to audit.
 
-### 6.3 Standards d'interopérabilité
+### 6.3 Interoperability standards
 
-| Standard | Usage | Priorité |
+| Standard | Usage | Priority |
 |----------|-------|----------|
-| **JSON Schema** | Définition des specs widget (déjà en place via Zod) | P1 — actuel |
-| **xAPI** | Tracking standardisé des interactions learning (qui, quoi, score) | P2 — analytics |
-| **LTI 1.3** | Intégration dans les LMS (Moodle, Canvas, D2L) | P3 — enterprise |
-| **Web Components** | Distribution standalone de widgets (embeddable) | P3 — open source |
+| **JSON Schema** | Widget spec definitions (already in place via Zod) | P1 — current |
+| **xAPI** | Standardized learning interaction tracking (who, what, score) | P2 — analytics |
+| **LTI 1.3** | Integration into LMS platforms (Moodle, Canvas, D2L) | P3 — enterprise |
+| **Web Components** | Standalone widget distribution (embeddable) | P3 — open source |
 
-### 6.4 Format JSON universel
+### 6.4 Universal JSON format
 
-Chaque widget est exportable en JSON standalone, portable entre instances :
+Each widget is exportable as standalone JSON, portable between instances:
 
 ```json
 {
@@ -857,11 +857,11 @@ Chaque widget est exportable en JSON standalone, portable entre instances :
 
 ---
 
-## 7. Architecture Runtime (Engage)
+## 7. Runtime Architecture (Engage)
 
 ### 7.1 Composition Engine
 
-Le moteur d'exécution des compositions — à implémenter dans Engage :
+The composition execution engine — to be implemented in Engage:
 
 ```typescript
 interface CompositionEngine {
@@ -888,7 +888,7 @@ interface CompositionEngine {
 
 ### 7.2 LLM Runtime
 
-Pour exécuter les blocs GENERATIVE pendant une session live :
+To execute GENERATIVE blocks during a live session:
 
 ```typescript
 async function executeGenerativeBlock(
@@ -929,43 +929,43 @@ async function executeGenerativeBlock(
 }
 ```
 
-**Clé LLM** : clé plateforme Qiplim (pas de BYOK côté Engage). Quota par session (ex: 20 appels max).
+**LLM key**: Qiplim platform key (no BYOK on the Engage side). Per-session quota (e.g., max 20 calls).
 
-**Cache** : le contenu généré est mis en cache par (stepId, sessionId). Si le présentateur revient en arrière puis re-avance, le contenu déjà généré est réutilisé.
+**Cache**: generated content is cached by (stepId, sessionId). If the presenter goes back then advances again, the already generated content is reused.
 
 ---
 
-## 8. Plan d'implémentation incrémental
+## 8. Incremental Implementation Plan
 
-### Phase A — Composition Runtime (2 semaines)
-- Implémenter `CompositionEngine` dans Engage
-- Mode SEQUENCE fonctionnel : navigation entre steps, progression
-- Format PlaybackPlan pour le deploy Studio → Engage
-- Modifier le deploy pour envoyer un PlaybackPlan au lieu de flatten
-- Backward compatible : projets sans plan continuent de fonctionner
+### Phase A — Composition Runtime (2 weeks)
+- Implement `CompositionEngine` in Engage
+- Functional SEQUENCE mode: navigation between steps, progression
+- PlaybackPlan format for Studio → Engage deployment
+- Modify deployment to send a PlaybackPlan instead of flatten
+- Backward compatible: projects without a plan continue to work
 
-### Phase B — Orchestration Conditionnelle (1 semaine)
-- Parser d'expressions simples (==, !=, >=, <=, >, <)
-- Évaluation des conditions sur les résultats du step précédent
-- Branchement conditionnel dans le Composition Engine
-- UI présentateur : affichage des branches possibles, override manuel
+### Phase B — Conditional Orchestration (1 week)
+- Simple expression parser (==, !=, >=, <=, >, <)
+- Condition evaluation on previous step results
+- Conditional branching in the Composition Engine
+- Presenter UI: display of possible branches, manual override
 
-### Phase C — Bloc GENERATIVE_TEXT (2 semaines)
-- Nouveau type de widget : GENERATIVE_TEXT avec promptTemplate + inputBindings
-- Résolution des bindings (accès aux résultats des steps précédents)
-- LLM runtime dans Engage (appel pendant la session, clé plateforme)
-- UI loading pendant la génération ("Le chapitre suivant arrive...")
-- Cache des résultats générés (éviter re-génération)
-- Fallback si LLM échoue ou quota dépassé
-- Quota configurable par PlaybackPlan
+### Phase C — GENERATIVE_TEXT Block (2 weeks)
+- New widget type: GENERATIVE_TEXT with promptTemplate + inputBindings
+- Binding resolution (access to previous step results)
+- LLM runtime in Engage (call during session, platform key)
+- Loading UI during generation ("The next chapter is coming...")
+- Cache for generated results (avoid re-generation)
+- Fallback if LLM fails or quota exceeded
+- Configurable quota per PlaybackPlan
 
-### Phase D — Nouveaux types statiques (1 semaine)
-- AUDIO : TTS pipeline (script → Voxtral/ElevenLabs → S3 → player avec transcript)
-- Améliorer SLIDE : blocs riches (heading, text, bullets, image, quote, code, statistic)
+### Phase D — New Static Types (1 week)
+- AUDIO: TTS pipeline (script → Voxtral/ElevenLabs → S3 → player with transcript)
+- Improve SLIDE: rich blocks (heading, text, bullets, image, quote, code, statistic)
 
-### Phase E — Templates de composition (1 semaine)
-- "Aventure interactive" — template avec chapitres + votes + blocs génératifs
-- "Formation complète" — intro + modules + quiz + recap + score-gating
+### Phase E — Composition Templates (1 week)
+- "Interactive adventure" — template with chapters + votes + generative blocks
+- "Complete training" — intro + modules + quiz + recap + score-gating
 - "Ice-breaker" — wordcloud + postit + ranking
-- "Simulation de crise" — briefing + décisions + conséquences conditionnelles + debrief
-- Disponibles comme suggestions dans le chat mode "Créer"
+- "Crisis simulation" — briefing + decisions + conditional consequences + debrief
+- Available as suggestions in the "Create" chat mode

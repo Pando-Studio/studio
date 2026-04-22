@@ -198,7 +198,7 @@ export default function DevelopersPage() {
             <a href="#widget-types" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">{t('navWidgetTypes')}</a>
             <a href="#api-reference" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">{t('navApiReference')}</a>
             <a href="#mcp-server" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">{t('navMcpServer')}</a>
-            <a href="https://github.com/pando-studio/qiplim" target="_blank" rel="noopener noreferrer" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">GitHub</a>
+            <a href="https://github.com/Qiplim/studio" target="_blank" rel="noopener noreferrer" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">GitHub</a>
           </nav>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -685,7 +685,7 @@ Content-Type: application/json`}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <nav className="flex items-center gap-6 text-sm font-display font-medium text-muted-foreground">
               <a
-                href="https://github.com/pando-studio/qiplim"
+                href="https://github.com/Qiplim/studio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-landing-text transition-colors flex items-center gap-1.5"
@@ -716,6 +716,22 @@ Content-Type: application/json`}
                 className="hover:text-landing-text transition-colors"
               >
                 llms.txt
+              </a>
+              <a
+                href="https://qiplim.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-landing-text transition-colors"
+              >
+                Qiplim
+              </a>
+              <a
+                href="https://pando-studio.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-landing-text transition-colors"
+              >
+                Pando Studio
               </a>
             </nav>
             <p className="text-sm text-muted-foreground">

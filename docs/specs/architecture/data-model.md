@@ -1,6 +1,6 @@
 # Qiplim Studio — Data Model
 
-Schema PostgreSQL 16 + pgvector. ORM Prisma. Base `qiplim_studio`.
+PostgreSQL 16 + pgvector schema. Prisma ORM. Database `qiplim_studio`.
 
 ---
 
@@ -28,7 +28,7 @@ PresentationVersionStatus DRAFT | GENERATING | READY | PUBLISHED
 ### Auth (BetterAuth)
 
 #### user
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK |
 | email | String | unique |
@@ -46,7 +46,7 @@ PresentationVersionStatus DRAFT | GENERATING | READY | PUBLISHED
 Relations: studios[], favorites[], providerConfigs[], documentFolders[], documentTags[]
 
 #### session
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK |
 | userId | String | FK → user |
@@ -58,7 +58,7 @@ Relations: studios[], favorites[], providerConfigs[], documentFolders[], documen
 Index: userId
 
 #### account
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK |
 | userId | String | FK → user |
@@ -75,7 +75,7 @@ Index: userId
 ### Studio
 
 #### Studio
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | title | String | |
@@ -93,7 +93,7 @@ Relations: sources[], widgets[], conversations[], presentations[], coursePlans[]
 Index: userId, anonymousSessionId
 
 #### StudioAnonymousSession
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | code | String | unique, varchar(6) |
@@ -103,14 +103,14 @@ Index: userId, anonymousSessionId
 Relations: studios[]
 Index: code
 
-> Note: les sessions anonymes sont depreciees (auth obligatoire). La table reste pour backward compat.
+> Note: anonymous sessions are deprecated (auth is mandatory). The table remains for backward compatibility.
 
 ---
 
 ### Sources & RAG
 
 #### StudioSource
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | studioId | String | FK → Studio |
@@ -132,7 +132,7 @@ Relations: chunks[], tags[], studio, folder
 Index: studioId, status, folderId
 
 #### StudioSourceChunk
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | sourceId | String | FK → StudioSource (cascade) |
@@ -150,7 +150,7 @@ Index: sourceId
 ### Widgets
 
 #### Widget
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | studioId | String | FK → Studio |
@@ -180,7 +180,7 @@ Index: studioId, type, parentId
 ### Conversations
 
 #### Conversation
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | studioId | String | FK → Studio (cascade) |
@@ -192,7 +192,7 @@ Relations: messages[], studio
 Index: studioId
 
 #### ConversationMessage
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | conversationId | String | FK → Conversation (cascade) |
@@ -211,7 +211,7 @@ Index: conversationId
 ### Presentations
 
 #### Presentation
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | studioId | String | FK → Studio |
@@ -221,7 +221,7 @@ Relations: versions[], studio
 Index: studioId
 
 #### PresentationVersion
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | presentationId | String | FK → Presentation (cascade) |
@@ -232,7 +232,7 @@ Relations: slides[], presentation
 Unique: (presentationId, version)
 
 #### Slide
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | presentationVersionId | String | FK → PresentationVersion (cascade) |
@@ -244,7 +244,7 @@ Relations: slideWidgets[]
 Index: presentationVersionId
 
 #### SlideWidget
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | slideId | String | FK → Slide (cascade) |
@@ -258,7 +258,7 @@ Unique: (slideId, widgetId)
 ### Generation
 
 #### GenerationRun
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | studioId | String | FK → Studio |
@@ -277,7 +277,7 @@ Unique: (slideId, widgetId)
 Index: studioId, status
 
 #### CoursePlan
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | studioId | String | FK → Studio |
@@ -295,23 +295,23 @@ Index: studioId
 ### Configuration
 
 #### ProviderConfig (studio-level BYOK)
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | studioId | String | FK → Studio (cascade) |
 | provider | AIProvider | |
-| apiKey | String | chiffre AES-256-GCM (prefix v2:) |
+| apiKey | String | encrypted AES-256-GCM (prefix v2:) |
 | isActive | Boolean | default true |
 
 Unique: (studioId, provider)
 
 #### UserProviderConfig (user-level BYOK)
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | userId | String | FK → user (cascade) |
 | provider | AIProvider | |
-| apiKey | String | chiffre AES-256-GCM (prefix v2:) |
+| apiKey | String | encrypted AES-256-GCM (prefix v2:) |
 | isActive | Boolean | default true |
 
 Unique: (userId, provider)
@@ -321,7 +321,7 @@ Unique: (userId, provider)
 ### User preferences
 
 #### UserFavorite
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | userId | String | FK → user (cascade) |
@@ -332,7 +332,7 @@ Unique: (userId, widgetId), (userId, coursePlanId)
 Index: userId
 
 #### DocumentFolder
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | userId | String | FK → user (cascade) |
@@ -344,7 +344,7 @@ Relations: children[] (self-ref), sources[]
 Index: userId
 
 #### DocumentTag
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | userId | String | FK → user (cascade) |
@@ -356,7 +356,7 @@ Unique: (userId, name)
 Index: userId
 
 #### DocumentTagSource (junction)
-| Champ | Type | Contrainte |
+| Field | Type | Constraint |
 |-------|------|-----------|
 | id | String | PK (cuid) |
 | tagId | String | FK → DocumentTag (cascade) |
@@ -366,16 +366,16 @@ Unique: (tagId, sourceId)
 
 ---
 
-## Tables manquantes (specifiees mais pas en DB)
+## Missing tables (specified but not in DB)
 
-| Table | Spec | Description | Priorite |
+| Table | Spec | Description | Priority |
 |-------|------|-------------|----------|
-| **WidgetPlayResult** | specs/lifecycle.md § 7 | Score + completion par widget par user en self-paced | P1 |
-| **StudioShare** | specs/lifecycle.md § 6 | Partage studio (roles owner/editor/viewer, lien public) | P1 |
+| **WidgetPlayResult** | specs/lifecycle.md § 7 | Score + completion per widget per user in self-paced mode | P1 |
+| **StudioShare** | specs/lifecycle.md § 6 | Studio sharing (owner/editor/viewer roles, public link) | P1 |
 
 ---
 
-## Diagramme des relations principales
+## Main relationship diagram
 
 ```
 user ──┬── Studio ──┬── StudioSource ── StudioSourceChunk (pgvector)

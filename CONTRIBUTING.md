@@ -1,4 +1,4 @@
-# Contributing to Qiplim
+# Contributing to Qiplim Studio
 
 Thanks for your interest in contributing! This guide covers setup, conventions, and how to add new widget types.
 
@@ -14,17 +14,23 @@ Thanks for your interest in contributing! This guide covers setup, conventions, 
 ### First-time setup
 
 ```bash
-git clone https://github.com/qiplim/qiplim.git
-cd qiplim
+git clone https://github.com/Qiplim/studio.git
+cd studio
 pnpm install
+cp .env.example .env
+# Edit .env with your API keys
+pnpm setup         # Starts Docker, pushes DB schema, launches dev server
+```
+
+Or step by step:
+
+```bash
 docker compose up -d
-cp apps/studio/.env.example apps/studio/.env
-cp apps/engage/.env.example apps/engage/.env
-# Edit .env files with your keys
-pnpm db:push:studio
-pnpm db:push:engage
+pnpm db:push
 pnpm dev
 ```
+
+The app runs at [http://localhost:3001](http://localhost:3001).
 
 ### Running checks
 
@@ -32,7 +38,6 @@ pnpm dev
 pnpm lint          # ESLint
 pnpm typecheck     # TypeScript
 pnpm test          # Unit tests (Vitest)
-pnpm test:e2e      # E2E tests (Playwright, requires dev server)
 ```
 
 ---
@@ -49,7 +54,7 @@ refactor(studio): extract TTS module
 test(studio): add audio generation tests
 ```
 
-**Scopes**: `studio`, `engage`, `db`, `ui`, `ci`, `docs`
+**Scopes**: `widget`, `ai`, `chat`, `db`, `ui`, `api`, `ci`, `docs`
 
 ---
 
@@ -78,24 +83,37 @@ fix/<short-description>
 ## Project Structure
 
 ```
-apps/
-  studio/           # AI widget generation (Next.js 15)
-  engage/           # Live interactive sessions (Next.js 15)
-packages/
-  db/               # Shared Prisma schema
-  db-studio/        # Studio Prisma client
-  db-engage/        # Engage Prisma client
-docs/
-  studio/           # Architecture specs
+app/                          # Next.js App Router
+  [locale]/                   # Locale-prefixed routes (en, fr)
+  (admin)/                    # Admin panel
+  (auth)/                     # Login, signup
+  (dashboard)/                # User dashboard, studios
+  (public)/                   # Public player, docs
+  api/                        # API routes (v1/, widgets/, mcp/)
+components/
+  widgets/                    # 28 widget types (Display + Editor per type)
+  widgets/player/             # Player components
+  studio/                     # Studio editor UI
+  ui/                         # shadcn/ui components
+lib/
+  ai/                         # Multi-LLM, TTS, image gen, embeddings
+  schemas/                    # Zod schemas (widget configs, composition)
+  widget-templates/           # JSON generation templates (24 templates)
+  queue/                      # BullMQ workers
+  mcp/                        # MCP server
+prisma/
+  schema.prisma               # Data model (40+ tables, pgvector)
+docs/                         # Specifications and roadmap
 ```
 
-### Key directories in Studio
+### Key files
 
-| Directory | Purpose |
-|-----------|---------|
+| Path | Purpose |
+|------|---------|
 | `components/widgets/{type}/` | Display + Editor per widget type |
 | `components/widgets/player/` | Player components (ReadablePlayer, MediaPlayer, etc.) |
-| `lib/schemas/widget-configs.ts` | Zod schemas for all widget configs |
+| `components/widgets/registry.tsx` | Widget type -> component mapping |
+| `lib/schemas/widget-configs.ts` | Zod schemas for all widget configs (source of truth) |
 | `lib/widget-templates/templates/` | JSON generation templates |
 | `lib/widget-templates/registry.ts` | Template registry |
 | `lib/ai/` | AI providers, TTS, image generation, embeddings |
@@ -107,7 +125,7 @@ docs/
 
 ### 1. Define the schema
 
-Add a Zod schema in `apps/studio/lib/schemas/widget-configs.ts`:
+Add a Zod schema in `lib/schemas/widget-configs.ts`:
 
 ```typescript
 export const MyWidgetConfigSchema = z.object({
@@ -122,7 +140,7 @@ Register it in `WidgetConfigSchemas`, `WidgetConfigMap`, and `getDefaultWidgetCo
 ### 2. Create Display and Editor components
 
 ```
-apps/studio/components/widgets/my-widget/
+components/widgets/my-widget/
   MyWidgetDisplay.tsx    # Read-only view
   MyWidgetEditor.tsx     # Edit form
   index.ts               # Barrel export
@@ -130,17 +148,17 @@ apps/studio/components/widgets/my-widget/
 
 ### 3. Register in the widget registry
 
-In `apps/studio/components/widgets/registry.tsx`, add your widget to the registry map.
+In `components/widgets/registry.tsx`, add your widget to the registry map.
 
 ### 4. Create a generation template
 
-Add `apps/studio/lib/widget-templates/templates/my-widget.json` following the existing pattern (see `summary-structured.json` for a simple example).
+Add `lib/widget-templates/templates/my-widget.json` following the existing pattern (see `summary-structured.json` for a simple example).
 
-Register it in `apps/studio/lib/widget-templates/registry.ts`.
+Register it in `lib/widget-templates/registry.ts`.
 
 ### 5. Add the type to Prisma
 
-If this is a new `WidgetType` enum value, add it to `packages/db/prisma/schema.prisma` and run `pnpm db:generate`.
+If this is a new `WidgetType` enum value, add it to `prisma/schema.prisma` and run `pnpm db:generate`.
 
 ### 6. Add a Player (optional)
 
@@ -160,6 +178,6 @@ If the widget needs interactive playback, create a Player component in `componen
 
 ## Questions?
 
-- Open a [GitHub Discussion](https://github.com/qiplim/qiplim/discussions)
-- File a [bug report](https://github.com/qiplim/qiplim/issues/new?template=bug_report.yml)
-- Propose a [new widget type](https://github.com/qiplim/qiplim/issues/new?template=new_widget_type.yml)
+- Open a [GitHub Discussion](https://github.com/Qiplim/studio/discussions)
+- File a [bug report](https://github.com/Qiplim/studio/issues/new?template=bug_report.yml)
+- Propose a [new widget type](https://github.com/Qiplim/studio/issues/new?template=new_widget_type.yml)

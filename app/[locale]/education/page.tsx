@@ -76,7 +76,7 @@ export default function EducationPage() {
   const navLinks = [
     { label: tNav('useCases'), href: '/#use-cases' },
     { label: tNav('openSource'), href: '/#open-source' },
-    { label: tNav('github'), href: 'https://github.com/pando-studio/qiplim', external: true },
+    { label: tNav('github'), href: 'https://github.com/Qiplim/studio', external: true },
   ] as const;
 
   return (
@@ -216,7 +216,7 @@ export default function EducationPage() {
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </a>
-            <a href="mailto:contact@pando-studio.fr">
+            <a href="mailto:bonsoir@pando-studio.com">
               <Button
                 variant="outline"
                 size="lg"
@@ -422,7 +422,7 @@ export default function EducationPage() {
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
             </a>
-            <a href="mailto:contact@pando-studio.fr">
+            <a href="mailto:bonsoir@pando-studio.com">
               <Button
                 variant="outline"
                 size="lg"
@@ -444,7 +444,7 @@ export default function EducationPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <nav className="flex items-center gap-6 text-sm font-display font-medium text-muted-foreground">
               <a
-                href="https://github.com/pando-studio/qiplim"
+                href="https://github.com/Qiplim/studio"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-landing-text transition-colors"
@@ -472,7 +472,7 @@ export default function EducationPage() {
             <p className="text-sm text-muted-foreground">
               {tFooter('madeBy')}{' '}
               <a
-                href="https://pando-studio.fr"
+                href="https://pando-studio.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold hover:text-landing-brand transition-colors"

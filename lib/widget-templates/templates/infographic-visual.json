@@ -1,0 +1,62 @@
+{
+  "id": "qiplim/infographic-visual",
+  "name": "Infographie",
+  "version": "1.0.0",
+  "description": "Infographie visuelle avec stats, listes et texte",
+  "widgetType": "INFOGRAPHIC",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "style": {
+          "type": "string",
+          "enum": ["stats", "overview", "comparison"],
+          "default": "overview",
+          "title": "Style"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "type": { "type": "string", "enum": ["stat", "text", "list", "comparison"] },
+              "title": { "type": "string" },
+              "content": { "type": "string" },
+              "value": { "type": "string" },
+              "items": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["id", "type"]
+          },
+          "minItems": 1
+        },
+        "colorScheme": { "type": "string" }
+      },
+      "required": ["title", "sections"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en visualisation de donnees. A partir du contenu fourni, cree une infographie structuree avec des sections de differents types:\n- stat: chiffre cle avec titre\n- text: paragraphe explicatif\n- list: liste a puces\n- comparison: comparaison\nGenere un id unique pour chaque section (format: s1, s2, etc.).",
+    "userPromptTemplate": "A partir du contenu suivant, genere une infographie (style: {{style}}).\n\nTitre: {{title}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), subtitle (string optionnel), sections (array de sections typees), colorScheme (string).",
+    "parameters": {
+      "temperature": 0.5,
+      "maxTokens": 4000
+    }
+  },
+
+  "rag": {
+    "topK": 12
+  }
+}

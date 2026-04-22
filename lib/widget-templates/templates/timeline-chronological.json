@@ -1,0 +1,56 @@
+{
+  "id": "qiplim/timeline-chronological",
+  "name": "Frise chronologique",
+  "version": "1.0.0",
+  "description": "Evenements ordonnes sur un axe temporel",
+  "widgetType": "TIMELINE",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "eventCount": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 20,
+          "default": 8,
+          "title": "Nombre d'evenements"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "date": { "type": "string" },
+              "title": { "type": "string" },
+              "description": { "type": "string" }
+            },
+            "required": ["id", "date", "title"]
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["title", "events"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en chronologie. A partir du contenu fourni, extrais les evenements cles et ordonne-les chronologiquement. Genere un id unique pour chaque evenement (format: t1, t2, etc.).",
+    "userPromptTemplate": "A partir du contenu suivant, genere une frise chronologique de {{eventCount}} evenements.\n\nTitre: {{title}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), events (array d'objets avec id, date, title, description).",
+    "parameters": {
+      "temperature": 0.4,
+      "maxTokens": 3000
+    }
+  },
+
+  "rag": {
+    "topK": 10
+  }
+}

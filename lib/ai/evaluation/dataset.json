@@ -1,0 +1,162 @@
+[
+  {
+    "id": "factual-fr-01",
+    "query": "Qu'est-ce que la pédagogie active ?",
+    "expectedSourceIds": ["src-pedagogie-intro"],
+    "expectedChunkKeywords": ["pédagogie", "active", "apprentissage", "participation"],
+    "category": "factual",
+    "language": "fr"
+  },
+  {
+    "id": "factual-fr-02",
+    "query": "Quels sont les principes de l'évaluation formative ?",
+    "expectedSourceIds": ["src-evaluation"],
+    "expectedChunkKeywords": ["évaluation", "formative", "feedback", "progression"],
+    "category": "factual",
+    "language": "fr"
+  },
+  {
+    "id": "factual-fr-03",
+    "query": "Définition de la taxonomie de Bloom",
+    "expectedSourceIds": ["src-bloom"],
+    "expectedChunkKeywords": ["Bloom", "taxonomie", "niveaux", "cognitif"],
+    "category": "factual",
+    "language": "fr"
+  },
+  {
+    "id": "factual-en-01",
+    "query": "What is constructive alignment?",
+    "expectedSourceIds": ["src-alignment"],
+    "expectedChunkKeywords": ["constructive", "alignment", "outcomes", "assessment"],
+    "category": "factual",
+    "language": "en"
+  },
+  {
+    "id": "factual-en-02",
+    "query": "What are the benefits of flipped classroom?",
+    "expectedSourceIds": ["src-flipped"],
+    "expectedChunkKeywords": ["flipped", "classroom", "student", "engagement"],
+    "category": "factual",
+    "language": "en"
+  },
+  {
+    "id": "factual-fr-04",
+    "query": "Quel est le rôle du formateur dans une classe inversée ?",
+    "expectedSourceIds": ["src-flipped", "src-formateur"],
+    "expectedChunkKeywords": ["formateur", "facilitateur", "accompagnement"],
+    "category": "factual",
+    "language": "fr"
+  },
+  {
+    "id": "factual-en-03",
+    "query": "Define learning objectives in curriculum design",
+    "expectedSourceIds": ["src-curriculum"],
+    "expectedChunkKeywords": ["learning", "objectives", "curriculum", "design"],
+    "category": "factual",
+    "language": "en"
+  },
+  {
+    "id": "analytical-fr-01",
+    "query": "Comparez l'approche par compétences et l'approche par objectifs",
+    "expectedSourceIds": ["src-competences", "src-objectifs"],
+    "expectedChunkKeywords": ["compétences", "objectifs", "approche", "différences"],
+    "category": "analytical",
+    "language": "fr"
+  },
+  {
+    "id": "analytical-fr-02",
+    "query": "Quelles sont les différences entre évaluation sommative et formative ?",
+    "expectedSourceIds": ["src-evaluation"],
+    "expectedChunkKeywords": ["sommative", "formative", "évaluation", "différences"],
+    "category": "analytical",
+    "language": "fr"
+  },
+  {
+    "id": "analytical-en-01",
+    "query": "Compare synchronous and asynchronous learning methods",
+    "expectedSourceIds": ["src-sync", "src-async"],
+    "expectedChunkKeywords": ["synchronous", "asynchronous", "learning", "comparison"],
+    "category": "analytical",
+    "language": "en"
+  },
+  {
+    "id": "analytical-en-02",
+    "query": "What are the trade-offs between project-based and lecture-based teaching?",
+    "expectedSourceIds": ["src-project-based", "src-lecture"],
+    "expectedChunkKeywords": ["project-based", "lecture", "trade-offs", "learning"],
+    "category": "analytical",
+    "language": "en"
+  },
+  {
+    "id": "analytical-fr-03",
+    "query": "Analysez les avantages et limites du QCM comme outil d'évaluation",
+    "expectedSourceIds": ["src-qcm", "src-evaluation"],
+    "expectedChunkKeywords": ["QCM", "avantages", "limites", "évaluation"],
+    "category": "analytical",
+    "language": "fr"
+  },
+  {
+    "id": "pedagogical-fr-01",
+    "query": "Quels sont les objectifs pédagogiques du chapitre 3 ?",
+    "expectedSourceIds": ["src-chapitre3"],
+    "expectedChunkKeywords": ["objectifs", "chapitre", "pédagogiques"],
+    "category": "pedagogical",
+    "language": "fr"
+  },
+  {
+    "id": "pedagogical-fr-02",
+    "query": "Comment structurer une séquence pédagogique sur la gestion de projet ?",
+    "expectedSourceIds": ["src-sequence", "src-gestion-projet"],
+    "expectedChunkKeywords": ["séquence", "pédagogique", "gestion", "projet"],
+    "category": "pedagogical",
+    "language": "fr"
+  },
+  {
+    "id": "pedagogical-en-01",
+    "query": "How to design a lesson plan for critical thinking skills?",
+    "expectedSourceIds": ["src-lesson-plan", "src-critical-thinking"],
+    "expectedChunkKeywords": ["lesson", "plan", "critical", "thinking"],
+    "category": "pedagogical",
+    "language": "en"
+  },
+  {
+    "id": "pedagogical-en-02",
+    "query": "What activities are recommended for teaching collaboration skills?",
+    "expectedSourceIds": ["src-collaboration"],
+    "expectedChunkKeywords": ["activities", "collaboration", "skills", "group"],
+    "category": "pedagogical",
+    "language": "en"
+  },
+  {
+    "id": "pedagogical-fr-03",
+    "query": "Proposez des activités d'évaluation pour un cours d'introduction à l'informatique",
+    "expectedSourceIds": ["src-informatique", "src-evaluation"],
+    "expectedChunkKeywords": ["évaluation", "informatique", "activités", "introduction"],
+    "category": "pedagogical",
+    "language": "fr"
+  },
+  {
+    "id": "factual-fr-05",
+    "query": "Qu'est-ce que la différenciation pédagogique ?",
+    "expectedSourceIds": ["src-differenciation"],
+    "expectedChunkKeywords": ["différenciation", "pédagogique", "élèves", "besoins"],
+    "category": "factual",
+    "language": "fr"
+  },
+  {
+    "id": "analytical-en-03",
+    "query": "How does gamification impact student motivation compared to traditional methods?",
+    "expectedSourceIds": ["src-gamification", "src-motivation"],
+    "expectedChunkKeywords": ["gamification", "motivation", "student", "traditional"],
+    "category": "analytical",
+    "language": "en"
+  },
+  {
+    "id": "pedagogical-fr-04",
+    "query": "Comment intégrer les outils numériques dans une formation en présentiel ?",
+    "expectedSourceIds": ["src-numerique", "src-presentiel"],
+    "expectedChunkKeywords": ["outils", "numériques", "présentiel", "intégrer"],
+    "category": "pedagogical",
+    "language": "fr"
+  }
+]

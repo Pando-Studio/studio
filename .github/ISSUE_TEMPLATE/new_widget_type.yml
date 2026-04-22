@@ -1,0 +1,49 @@
+name: New Widget Type
+description: Propose a new widget type for Qiplim
+labels: ["new widget type"]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Widget Name
+      description: e.g. "CROSSWORD", "KANBAN", "POLL"
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Interactive (user input required)
+        - Content (read-only, generated)
+        - Media (audio, video, image)
+        - Pedagogical (curriculum structure)
+        - Composed (container for other widgets)
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What does this widget do? What educational use case does it serve?
+    validations:
+      required: true
+  - type: textarea
+    id: schema
+    attributes:
+      label: Proposed JSON Schema
+      description: What would the widget's data structure look like?
+      render: json
+      placeholder: |
+        {
+          "type": "MY_WIDGET",
+          "data": {
+            "title": "...",
+            "items": [...]
+          }
+        }
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples
+      description: Real-world examples of this widget type in use.

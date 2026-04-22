@@ -1,0 +1,51 @@
+{
+  "id": "qiplim/summary-structured",
+  "name": "Resume structure",
+  "version": "1.0.0",
+  "description": "Resume structure avec sections et points cles",
+  "widgetType": "SUMMARY",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {}
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "heading": { "type": "string" },
+              "bullets": {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 1
+              }
+            },
+            "required": ["heading", "bullets"]
+          },
+          "minItems": 1
+        },
+        "sourceCount": { "type": "integer" }
+      },
+      "required": ["title", "sections"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en synthese. A partir du contenu fourni, redige un resume structure avec des sections claires et des points cles sous forme de bullet points.",
+    "userPromptTemplate": "A partir du contenu suivant, genere un resume structure.\n\nTitre: {{title}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), sections (array d'objets avec heading et bullets), sourceCount (nombre de sources utilisees).",
+    "parameters": {
+      "temperature": 0.5,
+      "maxTokens": 4000
+    }
+  },
+
+  "rag": {
+    "topK": 15
+  }
+}

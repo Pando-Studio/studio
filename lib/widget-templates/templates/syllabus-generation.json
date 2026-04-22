@@ -1,0 +1,46 @@
+{
+  "id": "qiplim/syllabus-generation",
+  "name": "Syllabus",
+  "version": "1.0.0",
+  "description": "Programme de formation structure avec objectifs, prerequis et plan detaille",
+  "widgetType": "SYLLABUS",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "locale": {
+          "type": "string",
+          "enum": ["fr-lmd", "fr-secondary", "fr-pro", "generic"],
+          "default": "generic",
+          "title": "Referentiel pedagogique"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string", "description": "Contenu Markdown du syllabus" },
+        "duration": { "type": "string" },
+        "level": { "type": "string" },
+        "objectives": { "type": "array", "items": { "type": "string" } },
+        "prerequisites": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "content"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en ingenierie pedagogique. A partir des sources fournies, genere un syllabus complet au format Markdown. Le syllabus doit inclure : description du programme, objectifs d'apprentissage, prerequis, plan des seances/modules, modalites d'evaluation, bibliographie. Structure le contenu avec des titres (##), sous-titres (###), listes et tableaux Markdown.",
+    "userPromptTemplate": "Genere un syllabus complet a partir du contenu suivant.\n\nTitre: {{title}}\nReferentiel: {{locale}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), content (string Markdown complet du syllabus), duration (string optionnel), level (string optionnel), objectives (array de strings), prerequisites (array de strings).",
+    "parameters": {
+      "temperature": 0.5,
+      "maxTokens": 8000
+    }
+  },
+
+  "rag": {
+    "topK": 20
+  }
+}

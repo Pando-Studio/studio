@@ -1,0 +1,65 @@
+{
+  "id": "qiplim/flashcard-learning",
+  "name": "Fiches d'apprentissage",
+  "version": "1.0.0",
+  "description": "Cartes recto-verso pour la revision",
+  "widgetType": "FLASHCARD",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "cardCount": {
+          "type": "string",
+          "enum": ["moins", "standard", "plus"],
+          "default": "standard",
+          "title": "Nombre de cartes"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["facile", "moyen", "difficile"],
+          "default": "moyen",
+          "title": "Difficulte"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "cardCount": { "type": "string", "enum": ["moins", "standard", "plus"] },
+        "difficulty": { "type": "string", "enum": ["facile", "moyen", "difficile"] },
+        "cards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "front": { "type": "string" },
+              "back": { "type": "string" }
+            },
+            "required": ["id", "front", "back"]
+          },
+          "minItems": 1
+        },
+        "shuffleOnStart": { "type": "boolean" },
+        "showProgress": { "type": "boolean" },
+        "enableSelfScoring": { "type": "boolean" }
+      },
+      "required": ["title", "cards"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en creation de fiches de revision. Genere des cartes avec un recto court (1-5 mots : terme, concept, date) et un verso concis (definition, explication). Genere un id unique pour chaque carte (format: f1, f2, etc.). Nombre de cartes: moins=5, standard=15, plus=30.",
+    "userPromptTemplate": "A partir du contenu suivant, genere des fiches d'apprentissage (niveau: {{difficulty}}, quantite: {{cardCount}}).\n\nTitre: {{title}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), cardCount, difficulty, cards (array d'objets avec id, front, back), shuffleOnStart (true), showProgress (true), enableSelfScoring (true).",
+    "parameters": {
+      "temperature": 0.6,
+      "maxTokens": 4000
+    }
+  },
+
+  "rag": {
+    "topK": 10
+  }
+}

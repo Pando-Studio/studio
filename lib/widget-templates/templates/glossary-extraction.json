@@ -1,0 +1,56 @@
+{
+  "id": "qiplim/glossary-extraction",
+  "name": "Glossaire",
+  "version": "1.0.0",
+  "description": "Glossaire de termes et definitions extraits des sources",
+  "widgetType": "GLOSSARY",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "termCount": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 50,
+          "default": 15,
+          "title": "Nombre de termes"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "term": { "type": "string" },
+              "definition": { "type": "string" }
+            },
+            "required": ["id", "term", "definition"]
+          },
+          "minItems": 1
+        },
+        "sortAlphabetically": { "type": "boolean" }
+      },
+      "required": ["title", "terms"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en terminologie. A partir du contenu fourni, extrais les termes cles et redige des definitions precises et accessibles. Genere un id unique pour chaque terme (format: g1, g2, etc.).",
+    "userPromptTemplate": "A partir du contenu suivant, genere un glossaire de {{termCount}} termes.\n\nTitre: {{title}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), terms (array d'objets avec id, term, definition), sortAlphabetically (boolean, true par defaut).",
+    "parameters": {
+      "temperature": 0.4,
+      "maxTokens": 3000
+    }
+  },
+
+  "rag": {
+    "topK": 10
+  }
+}

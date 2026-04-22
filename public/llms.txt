@@ -1,0 +1,102 @@
+# Qiplim Studio
+
+> AI-powered educational content generation platform
+
+## Overview
+
+Qiplim Studio generates interactive educational widgets (quizzes, flashcards, presentations, timelines, etc.) from source documents using AI. It supports 24 widget types, multiple AI providers (Mistral, OpenAI, Anthropic, Google), and outputs structured JSON ready for rendering.
+
+## API
+
+- Base URL: https://studio.qiplim.com/api/v1
+- Auth: Bearer token (API key starting with `sk_`)
+- OpenAPI spec: https://studio.qiplim.com/api/v1/openapi.json
+- Rate limit: 100 requests/hour per API key
+
+## Endpoints
+
+### POST /api/v1/generate/{type}
+Generate a widget of the given type. Requires `title` (string). Optional: `sources` (string[]), `inputs` (object), `language` (string, default "fr"), `provider` (string).
+
+### GET /api/v1/types
+List all available widget types with their input schemas.
+
+### GET /api/v1/openapi.json
+OpenAPI 3.1 specification (no auth required).
+
+## Widget Types
+
+- quiz-interactive: Quiz with multiple-choice questions, scoring, and explanations
+- roleplay-conversation: Roleplay scenario for soft-skills training
+- wordcloud-interactive: Collaborative word cloud for exploring key concepts
+- slide-simple: Single slide with deterministic JSON rendering
+- presentation-from-sources: Complete presentation deck from source documents
+- multiple-choice-interactive: Multiple-choice questions with correction and feedback
+- postit-brainstorm: Brainstorming session with categorized post-its
+- ranking-prioritization: Rank elements by priority or preference
+- opentext-reflection: Open-ended question for individual reflection
+- image-generation: Generate an image from a text prompt
+- faq-extraction: FAQ extracted from sources
+- glossary-extraction: Glossary of terms and definitions from sources
+- summary-structured: Structured summary with sections and key points
+- flashcard-learning: Front/back flashcards for revision
+- timeline-chronological: Events on a chronological axis
+- report-document: Structured document (synthesis, guide, article)
+- data-table-extraction: Structured data table (columns + rows)
+- mindmap-extraction: Hierarchical mind map from sources
+- infographic-visual: Visual infographic with stats, lists, and text
+- syllabus-generation: Training program with objectives, prerequisites, and plan
+- session-plan-generation: Detailed lesson plan with objectives and activities
+- program-overview-generation: Higher education program overview (credits, competencies)
+- class-overview-generation: Secondary class overview with progression and chapters
+- qcm-evaluation: Set of multiple-choice questions with correction
+
+## Quick Start
+
+```
+POST /api/v1/generate/quiz-interactive
+Authorization: Bearer sk_...
+Content-Type: application/json
+
+{
+  "title": "Quiz sur la Revolution francaise",
+  "sources": ["La Revolution francaise commence en 1789..."],
+  "inputs": { "questionCount": 5, "difficulty": "medium" },
+  "language": "fr"
+}
+```
+
+Response:
+```json
+{
+  "widget": { "id": "...", "type": "QUIZ", "title": "...", "data": { ... } },
+  "usage": { "inputTokens": 1200, "outputTokens": 800, "totalTokens": 2000, "model": "...", "provider": "mistral" },
+  "template": { "id": "qiplim/quiz-interactive", "version": "2.0.0" }
+}
+```
+
+## MCP Server
+
+Qiplim Studio is available as an MCP (Model Context Protocol) server for LLM integrations.
+
+### Stdio transport (Claude Code, Cursor, etc.)
+```
+QIPLIM_API_KEY=sk_... npx qiplim-mcp
+```
+
+### Streamable HTTP transport
+```
+POST https://studio.qiplim.com/api/mcp
+Authorization: Bearer sk_...
+Content-Type: application/json
+
+(JSON-RPC 2.0 messages)
+```
+
+### MCP Tools
+- `list_widget_types`: List available widget types and their schemas
+- `generate_widget`: Generate an educational widget from source text
+- `search_sources`: Search indexed sources within a studio
+
+### MCP Resources
+- `widget-types://list`: Full list of widget types with schemas

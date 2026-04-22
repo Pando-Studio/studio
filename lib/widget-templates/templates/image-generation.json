@@ -1,0 +1,53 @@
+{
+  "id": "qiplim/image-generation",
+  "version": "1.0.0",
+  "name": "Generation d'image",
+  "description": "Genere une image a partir d'un prompt textuel",
+  "widgetType": "IMAGE",
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Description detaillee de l'image a generer"
+        },
+        "style": {
+          "type": "string",
+          "enum": ["photo", "illustration", "3d", "art"],
+          "default": "photo",
+          "description": "Style visuel de l'image"
+        },
+        "aspectRatio": {
+          "type": "string",
+          "enum": ["1:1", "16:9", "9:16", "4:3"],
+          "default": "16:9",
+          "description": "Ratio d'aspect de l'image"
+        }
+      },
+      "required": ["prompt"]
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "imageUrl": { "type": "string" },
+        "prompt": { "type": "string" },
+        "model": { "type": "string" },
+        "style": { "type": "string" },
+        "aspectRatio": { "type": "string" }
+      }
+    }
+  },
+  "generation": {
+    "type": "image",
+    "systemPrompt": "",
+    "userPromptTemplate": "{{prompt}}",
+    "parameters": {
+      "temperature": 0.7,
+      "maxTokens": 100
+    }
+  },
+  "rag": {
+    "topK": 0
+  }
+}

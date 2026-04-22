@@ -1,0 +1,76 @@
+{
+  "id": "qiplim/wordcloud-interactive",
+  "name": "Nuage de Mots Interactif",
+  "version": "1.0.0",
+  "description": "Nuage de mots collaboratif pour explorer les concepts clés",
+  "widgetType": "WORDCLOUD",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "maxWords": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 100,
+          "default": 30,
+          "title": "Nombre maximum de mots affichés"
+        },
+        "minWordLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "default": 2,
+          "title": "Longueur minimale des mots"
+        },
+        "maxWordLength": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 50,
+          "default": 30,
+          "title": "Longueur maximale des mots"
+        }
+      },
+      "required": []
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "The question or prompt to display to participants"
+        },
+        "maxWords": {
+          "type": "integer",
+          "description": "Maximum number of words displayed in the cloud"
+        },
+        "minWordLength": {
+          "type": "integer",
+          "description": "Minimum character length for a word"
+        },
+        "maxWordLength": {
+          "type": "integer",
+          "description": "Maximum character length for a word"
+        },
+        "showLiveResults": {
+          "type": "boolean",
+          "description": "Show live results in real-time"
+        }
+      },
+      "required": ["prompt"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en animation de groupe et création de contenus interactifs. Tu crées des questions engageantes pour des nuages de mots collaboratifs. La question doit encourager des réponses courtes (1-3 mots) et être ouverte.",
+    "userPromptTemplate": "Crée une question pour un nuage de mots sur le sujet: \"{{title}}\"\n{{#description}}Description: {{description}}\n{{/description}}\nLangue: {{language}}\n\nContenu de référence:\n{{context}}\n\nInstructions:\n- Le champ 'prompt' doit contenir une question ouverte et engageante qui invite des réponses en 1-3 mots\n- Le champ 'maxWords' doit être {{maxWords}}\n- Le champ 'minWordLength' doit être {{minWordLength}}\n- Le champ 'maxWordLength' doit être {{maxWordLength}}\n- Le champ 'showLiveResults' doit être true\n- Base-toi sur le contenu de référence fourni",
+    "parameters": {
+      "temperature": 0.8,
+      "maxTokens": 1500
+    }
+  },
+
+  "rag": {
+    "topK": 5
+  }
+}

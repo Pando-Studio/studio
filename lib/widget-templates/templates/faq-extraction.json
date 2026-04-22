@@ -1,0 +1,55 @@
+{
+  "id": "qiplim/faq-extraction",
+  "name": "FAQ",
+  "version": "1.0.0",
+  "description": "Questions-reponses frequentes extraites des sources",
+  "widgetType": "FAQ",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "questionCount": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 20,
+          "default": 8,
+          "title": "Nombre de questions"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "question": { "type": "string" },
+              "answer": { "type": "string" }
+            },
+            "required": ["id", "question", "answer"]
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["title", "items"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en creation de FAQ. A partir du contenu fourni, extrais les questions les plus frequentes ou importantes et redige des reponses claires et concises. Genere un id unique pour chaque item (format: faq1, faq2, etc.).",
+    "userPromptTemplate": "A partir du contenu suivant, genere une FAQ de {{questionCount}} questions-reponses.\n\nTitre: {{title}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), items (array d'objets avec id, question, answer).",
+    "parameters": {
+      "temperature": 0.5,
+      "maxTokens": 3000
+    }
+  },
+
+  "rag": {
+    "topK": 10
+  }
+}

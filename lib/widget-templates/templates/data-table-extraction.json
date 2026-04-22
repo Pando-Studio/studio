@@ -1,0 +1,60 @@
+{
+  "id": "qiplim/data-table-extraction",
+  "name": "Tableau de donnees",
+  "version": "1.0.0",
+  "description": "Extraction de donnees structurees en tableau (colonnes + lignes)",
+  "widgetType": "DATA_TABLE",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "instructions": {
+          "type": "string",
+          "title": "Instructions",
+          "description": "Decrire les donnees a extraire, ex: 'Comparer les 3 technologies'"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string" },
+              "type": { "type": "string", "enum": ["string", "number", "date", "boolean"] }
+            },
+            "required": ["id", "label", "type"]
+          },
+          "minItems": 1
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "required": ["title", "columns", "rows"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en extraction de donnees structurees. A partir du contenu fourni, identifie les donnees qui peuvent etre organisees en tableau et genere un tableau avec colonnes pertinentes. Genere un id unique pour chaque colonne (format: col1, col2, etc.).",
+    "userPromptTemplate": "Extrait des donnees structurees du contenu suivant.\n{{#if instructions}}Instructions: {{instructions}}\n{{/if}}\nTitre: {{title}}\nLangue: {{language}}\n\nContenu:\n{{context}}\n\nGenere un JSON avec les champs: title (string), columns (array d'objets avec id, label, type), rows (array d'objets dont les cles correspondent aux id des colonnes).",
+    "parameters": {
+      "temperature": 0.3,
+      "maxTokens": 5000
+    }
+  },
+
+  "rag": {
+    "topK": 15
+  }
+}

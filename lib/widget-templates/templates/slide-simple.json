@@ -1,0 +1,148 @@
+{
+  "id": "qiplim/slide-simple",
+  "name": "Slide Simple",
+  "version": "1.0.0",
+  "description": "Generates a single slide with SlideSpec JSON for deterministic rendering",
+  "widgetType": "SLIDE",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "type": "string",
+          "enum": ["title", "section", "content", "summary", "interactive"],
+          "default": "content",
+          "title": "Intent de la slide",
+          "description": "Le but principal de cette slide"
+        },
+        "layoutHint": {
+          "type": "string",
+          "enum": ["auto", "simple", "two-columns", "media-left", "media-right", "media-center", "full-media"],
+          "default": "auto",
+          "title": "Suggestion de layout",
+          "description": "Le layout suggéré pour cette slide (auto laisse l'IA décider)"
+        },
+        "textDensity": {
+          "type": "string",
+          "enum": ["minimal", "balanced", "detailed"],
+          "default": "balanced",
+          "title": "Densité de texte",
+          "description": "Quantité de texte sur la slide"
+        },
+        "includeImage": {
+          "type": "boolean",
+          "default": false,
+          "title": "Inclure une image",
+          "description": "Générer une image pour cette slide"
+        },
+        "activitySlot": {
+          "type": "string",
+          "enum": ["none", "quiz", "wordcloud", "postit"],
+          "default": "none",
+          "title": "Activité interactive",
+          "description": "Type d'activité à inclure sur la slide"
+        },
+        "keyPoints": {
+          "type": "array",
+          "items": { "type": "string" },
+          "title": "Points clés",
+          "description": "Points clés à couvrir sur cette slide"
+        }
+      },
+      "required": []
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identifiant unique de la slide"
+        },
+        "intent": {
+          "type": "string",
+          "enum": ["title", "section", "content", "summary", "interactive"],
+          "description": "Intent de la slide"
+        },
+        "layout": {
+          "type": "string",
+          "enum": ["simple", "two-columns", "media-left", "media-right", "media-center", "full-media"],
+          "description": "Layout de la slide"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["heading", "text", "bullets", "numbered", "grid", "image", "quote", "statistic"]
+              },
+              "level": { "type": "integer", "minimum": 1, "maximum": 3 },
+              "text": { "type": "string" },
+              "content": { "type": "string" },
+              "emphasis": { "type": "boolean" },
+              "items": { "type": "array", "items": { "type": "string" } },
+              "cells": { "type": "array" },
+              "ref": { "type": "object" },
+              "caption": { "type": "string" },
+              "attribution": { "type": "string" },
+              "value": { "type": "string" },
+              "label": { "type": "string" },
+              "icon": { "type": "string" }
+            },
+            "required": ["type"]
+          },
+          "description": "Blocs de contenu de la slide"
+        },
+        "speakerNotes": {
+          "type": "string",
+          "description": "Notes pour le présentateur"
+        },
+        "assets": {
+          "type": "object",
+          "properties": {
+            "heroImage": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "prompt": { "type": "string" },
+                "source": { "type": "string", "enum": ["ai", "unsplash"] }
+              }
+            },
+            "icons": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "slots": {
+          "type": "object",
+          "properties": {
+            "activity": {
+              "type": "object",
+              "properties": {
+                "allowed": { "type": "array", "items": { "type": "string" } },
+                "childWidgetId": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "required": ["id", "intent", "layout", "blocks"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en création de slides pédagogiques. Tu génères des SlideSpec JSON structurées qui seront rendues de manière déterministe.\n\nRègles importantes:\n1. Chaque slide doit avoir un intent clair (title, section, content, summary, interactive)\n2. Le layout doit correspondre au contenu (simple pour texte, media-* pour images)\n3. Les blocs doivent être variés: heading, text, bullets, numbered, grid, quote, statistic\n4. Pour les slides interactives, définis le slot activity avec le type autorisé\n5. Les speakerNotes sont optionnelles mais recommandées\n6. Si une image est demandée, génère un prompt descriptif dans assets.heroImage\n\nFormats de blocs:\n- heading: { type: 'heading', level: 1|2|3, text: string }\n- text: { type: 'text', content: string, emphasis?: boolean }\n- bullets: { type: 'bullets', items: string[] }\n- numbered: { type: 'numbered', items: string[] }\n- grid: { type: 'grid', cells: [{ heading, content, icon?, statistic? }] }\n- quote: { type: 'quote', text: string, attribution?: string }\n- statistic: { type: 'statistic', value: string, label: string, icon?: string }",
+    "userPromptTemplate": "Génère une SlideSpec JSON pour une slide avec les paramètres suivants:\n\nTitre: {{title}}\n{{#description}}Description: {{description}}\n{{/description}}\nIntent: {{intent}}\nLayout suggéré: {{layoutHint}}\nDensité de texte: {{textDensity}}\nInclure image: {{includeImage}}\nActivité: {{activitySlot}}\n{{#keyPoints}}Points clés à couvrir:\n{{#each keyPoints}}- {{this}}\n{{/each}}{{/keyPoints}}\nLangue: {{language}}\n\nContenu de référence:\n{{context}}\n\nGénère une SlideSpec complète et structurée en JSON.",
+    "parameters": {
+      "temperature": 0.6,
+      "maxTokens": 2000
+    }
+  },
+
+  "rag": {
+    "topK": 8
+  }
+}

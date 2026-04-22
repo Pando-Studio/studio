@@ -1,0 +1,42 @@
+// SlideSpec exports
+export {
+  AssetRefSchema,
+  GridCellSchema,
+  HeadingBlockSchema,
+  TextBlockSchema,
+  BulletsBlockSchema,
+  NumberedBlockSchema,
+  GridBlockSchema,
+  ImageBlockSchema,
+  QuoteBlockSchema,
+  StatisticBlockSchema,
+  ActivitySlotSchema,
+  SlideIntentSchema,
+  SlideLayoutSchema,
+  SlideSpecSchema,
+  SlideSummarySchema,
+  type AssetRef,
+  type GridCell,
+  type SlideBlock,
+  type ActivitySlot,
+  type SlideIntent,
+  type SlideLayout,
+  type SlideSpec,
+  type SlideSummary,
+} from './slide-spec';
+
+// PresentationSpec exports
+export {
+  ThemeConfigSchema,
+  NavigationConfigSchema,
+  DeckPlanSchema,
+  PresentationGenerationConfigSchema,
+  PresentationSpecSchema,
+  DeckPlanOutputSchema,
+  type ThemeConfig,
+  type NavigationConfig,
+  type DeckPlan,
+  type PresentationGenerationConfig,
+  type PresentationSpec,
+  type DeckPlanOutput,
+} from './presentation-spec';

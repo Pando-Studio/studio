@@ -1,0 +1,86 @@
+{
+  "id": "qiplim/ranking-prioritization",
+  "name": "Classement par priorite",
+  "version": "1.0.0",
+  "description": "Classement d'elements par ordre de priorite ou de preference",
+  "widgetType": "RANKING",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Consigne de classement",
+          "description": "La question ou l'instruction pour le classement"
+        },
+        "itemCount": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 15,
+          "default": 5,
+          "title": "Nombre d'elements a classer"
+        },
+        "timeLimit": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 600,
+          "title": "Temps limite (secondes)"
+        }
+      },
+      "required": []
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "The ranking instruction/question"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier for the item (UUID format)"
+              },
+              "label": {
+                "type": "string",
+                "description": "Short label for the item"
+              },
+              "description": {
+                "type": "string",
+                "description": "Detailed description of the item"
+              }
+            },
+            "required": ["id", "label"]
+          },
+          "minItems": 3,
+          "maxItems": 15
+        },
+        "timeLimit": {
+          "type": "integer",
+          "description": "Time limit in seconds"
+        },
+        "showLiveResults": {
+          "type": "boolean",
+          "description": "Show live results in real-time"
+        }
+      },
+      "required": ["prompt", "items"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en pedagogie. Tu crees des activites de classement pertinentes ou les elements sont suffisamment distincts pour generer du debat mais pas triviaux a ordonner. Chaque element doit avoir un label clair et une description courte. Tu generes un id UUID unique pour chaque element.",
+    "userPromptTemplate": "Cree une activite de classement sur le sujet: \"{{title}}\"\n{{#description}}Description: {{description}}\n{{/description}}\n{{#prompt}}Consigne: {{prompt}}\n{{/prompt}}\nNombre d'elements: {{itemCount}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nInstructions:\n- Genere exactement {{itemCount}} elements a classer\n- Chaque element a un 'id' unique (format UUID v4), un 'label' court et une 'description'\n- Les elements doivent etre comparables et susciter la reflexion\n- Le prompt doit clairement indiquer le critere de classement\n- Le champ 'showLiveResults' doit etre true\n- Base-toi sur le contenu de reference fourni",
+    "parameters": {
+      "temperature": 0.7,
+      "maxTokens": 3000
+    }
+  },
+
+  "rag": { "topK": 10 }
+}

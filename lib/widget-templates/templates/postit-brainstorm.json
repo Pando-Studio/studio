@@ -1,0 +1,78 @@
+{
+  "id": "qiplim/postit-brainstorm",
+  "name": "Post-it Brainstorm",
+  "version": "1.0.0",
+  "description": "Session de brainstorming avec post-its categorises",
+  "widgetType": "POSTIT",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Question ou theme",
+          "description": "La question ou le theme pour le brainstorming"
+        },
+        "categoryCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8,
+          "default": 3,
+          "title": "Nombre de categories"
+        },
+        "maxPostIts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 5,
+          "title": "Post-its max par participant"
+        },
+        "allowVoting": {
+          "type": "boolean",
+          "default": true,
+          "title": "Autoriser le vote"
+        }
+      },
+      "required": []
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "The question or prompt for brainstorming"
+        },
+        "categories": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Categories to organize ideas"
+        },
+        "maxPostIts": {
+          "type": "integer",
+          "description": "Maximum post-its per participant"
+        },
+        "allowVoting": {
+          "type": "boolean",
+          "description": "Whether participants can vote on post-its"
+        },
+        "showLiveResults": {
+          "type": "boolean",
+          "description": "Show live results in real-time"
+        }
+      },
+      "required": ["prompt"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en facilitation et brainstorming. Tu crees des activites de post-it engageantes avec des categories pertinentes pour structurer la reflexion. Le prompt doit etre ouvert et stimulant.",
+    "userPromptTemplate": "Cree une activite Post-it sur le sujet: \"{{title}}\"\n{{#description}}Description: {{description}}\n{{/description}}\n{{#prompt}}Question/theme propose: {{prompt}}\n{{/prompt}}\nNombre de categories: {{categoryCount}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nInstructions:\n- Genere un prompt engageant et ouvert\n- Propose {{categoryCount}} categories pertinentes pour organiser les idees\n- Les categories doivent couvrir differents angles du sujet\n- Le champ 'maxPostIts' doit etre {{maxPostIts}}\n- Le champ 'allowVoting' doit etre {{allowVoting}}\n- Le champ 'showLiveResults' doit etre true\n- Base-toi sur le contenu de reference fourni",
+    "parameters": {
+      "temperature": 0.8,
+      "maxTokens": 2000
+    }
+  },
+
+  "rag": { "topK": 8 }
+}

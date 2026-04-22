@@ -1,0 +1,87 @@
+{
+  "id": "qiplim/opentext-reflection",
+  "name": "Texte libre - Reflexion",
+  "version": "1.0.0",
+  "description": "Question ouverte pour une reflexion individuelle",
+  "widgetType": "OPENTEXT",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "title": "Question ouverte",
+          "description": "La question pour la reflexion"
+        },
+        "placeholder": {
+          "type": "string",
+          "title": "Texte d'aide",
+          "description": "Placeholder dans le champ de saisie"
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 500,
+          "default": 10,
+          "title": "Longueur minimale (caracteres)"
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 50,
+          "maximum": 5000,
+          "default": 500,
+          "title": "Longueur maximale (caracteres)"
+        },
+        "timeLimit": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 600,
+          "title": "Temps limite (secondes)"
+        }
+      },
+      "required": []
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "The open question for reflection"
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "Placeholder text in the input field"
+        },
+        "minLength": {
+          "type": "integer",
+          "description": "Minimum character length for the response"
+        },
+        "maxLength": {
+          "type": "integer",
+          "description": "Maximum character length for the response"
+        },
+        "timeLimit": {
+          "type": "integer",
+          "description": "Time limit in seconds"
+        },
+        "showLiveResults": {
+          "type": "boolean",
+          "description": "Show live results in real-time"
+        }
+      },
+      "required": ["prompt"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en pedagogie. Tu crees des questions ouvertes profondes qui stimulent la reflexion critique. La question doit etre ouverte, non binaire, et inviter a l'argumentation. Le placeholder doit guider sans orienter.",
+    "userPromptTemplate": "Cree une question ouverte sur le sujet: \"{{title}}\"\n{{#description}}Description: {{description}}\n{{/description}}\n{{#prompt}}Question proposee: {{prompt}}\n{{/prompt}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nInstructions:\n- Genere un prompt engageant qui invite a la reflexion\n- Le prompt doit etre ouvert et non binaire (pas de oui/non)\n- Propose un placeholder utile pour guider la saisie\n- Le champ 'minLength' doit etre {{minLength}}\n- Le champ 'maxLength' doit etre {{maxLength}}\n- Le champ 'showLiveResults' doit etre true\n- Base-toi sur le contenu de reference fourni",
+    "parameters": {
+      "temperature": 0.8,
+      "maxTokens": 1500
+    }
+  },
+
+  "rag": { "topK": 8 }
+}

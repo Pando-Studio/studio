@@ -1,0 +1,113 @@
+{
+  "id": "qiplim/roleplay-conversation",
+  "name": "Jeu de Rôle Conversation",
+  "version": "2.0.0",
+  "description": "Scénario de jeu de rôle pour l'entraînement aux compétences relationnelles",
+  "widgetType": "ROLEPLAY",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "roleCount": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 6,
+          "default": 2,
+          "title": "Nombre de rôles"
+        },
+        "scenario": {
+          "type": "string",
+          "title": "Contexte additionnel du scénario"
+        },
+        "personality": {
+          "type": "string",
+          "enum": ["cooperative", "neutral", "challenging", "difficult"],
+          "default": "neutral",
+          "title": "Personnalité des personnages"
+        }
+      },
+      "required": []
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "scenario": {
+          "type": "string",
+          "description": "Title/summary of the roleplay scenario"
+        },
+        "context": {
+          "type": "string",
+          "description": "Background context for the scenario"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier for the role (UUID format)"
+              },
+              "name": {
+                "type": "string",
+                "description": "Name/title of the role"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the role"
+              },
+              "personality": {
+                "type": "string",
+                "description": "Personality traits of the character"
+              },
+              "objectives": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Objectives for this role"
+              },
+              "constraints": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Constraints or challenges"
+              }
+            },
+            "required": ["id", "name", "description"]
+          }
+        },
+        "objectives": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Overall learning objectives"
+        },
+        "assignmentMethod": {
+          "type": "string",
+          "enum": ["random", "presenter", "participant"],
+          "description": "How roles are assigned to participants"
+        },
+        "debriefingEnabled": {
+          "type": "boolean",
+          "description": "Whether a debriefing phase is enabled"
+        },
+        "showLiveResults": {
+          "type": "boolean",
+          "description": "Show live results in real-time"
+        }
+      },
+      "required": ["scenario", "context", "roles", "assignmentMethod"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en conception de scénarios de jeux de rôles pédagogiques. Tu crées des situations réalistes et engageantes qui permettent aux apprenants de pratiquer leurs compétences relationnelles et professionnelles. Tu génères un id UUID unique pour chaque rôle.",
+    "userPromptTemplate": "Crée un scénario de jeu de rôles sur le sujet: \"{{title}}\"\n{{#description}}Description: {{description}}\n{{/description}}\n{{#scenario}}Contexte additionnel: {{scenario}}\n{{/scenario}}\nNombre de rôles: {{roleCount}}\nPersonnalité des personnages: {{personality}}\nLangue: {{language}}\n\nContenu de référence:\n{{context}}\n\nInstructions:\n- Le champ 'scenario' doit résumer le scénario en une phrase\n- Le champ 'context' doit fournir le contexte détaillé\n- Chaque rôle doit avoir un 'id' UUID unique, un 'name', une 'description', des 'personality' traits, des 'objectives' et des 'constraints'\n- Le champ 'assignmentMethod' doit être 'random'\n- Le champ 'debriefingEnabled' doit être true\n- Ajoute un champ 'objectives' global avec les apprentissages visés\n- Les rôles doivent avoir des objectifs parfois conflictuels\n- La situation doit permettre une résolution par la négociation ou la collaboration\n- Base-toi sur le contenu de référence fourni",
+    "parameters": {
+      "temperature": 0.8,
+      "maxTokens": 3000
+    }
+  },
+
+  "rag": {
+    "topK": 8
+  }
+}

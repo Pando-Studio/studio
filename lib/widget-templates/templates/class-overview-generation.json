@@ -1,0 +1,47 @@
+{
+  "id": "qiplim/class-overview-generation",
+  "name": "Classe",
+  "version": "1.0.0",
+  "description": "Vue d'ensemble d'une classe (secondaire) avec progression, chapitres et activites",
+  "widgetType": "CLASS_OVERVIEW",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "title": "Matiere"
+        },
+        "grade": {
+          "type": "string",
+          "title": "Niveau (ex: Terminale, Seconde)"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string", "description": "Contenu Markdown de la vue de classe" },
+        "subject": { "type": "string" },
+        "grade": { "type": "string" },
+        "objectives": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "content"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en pedagogie pour l'enseignement secondaire. A partir des sources fournies, genere une vue d'ensemble de classe au format Markdown. Le document doit inclure : presentation de la matiere et du niveau, objectifs du programme officiel, progression annuelle (chapitres/sequences), types d'activites prevues, modalites d'evaluation. Structure avec des titres (##), tableaux de progression et listes.",
+    "userPromptTemplate": "Genere une vue d'ensemble de classe a partir du contenu suivant.\n\nTitre: {{title}}\nMatiere: {{subject}}\nNiveau: {{grade}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), content (string Markdown complet), subject (string optionnel), grade (string optionnel), objectives (array de strings).",
+    "parameters": {
+      "temperature": 0.5,
+      "maxTokens": 6000
+    }
+  },
+
+  "rag": {
+    "topK": 15
+  }
+}

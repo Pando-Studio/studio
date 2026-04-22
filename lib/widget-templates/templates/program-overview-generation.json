@@ -1,0 +1,39 @@
+{
+  "id": "qiplim/program-overview-generation",
+  "name": "Programme",
+  "version": "1.0.0",
+  "description": "Vue d'ensemble d'un programme d'enseignement superieur (UE, credits, competences)",
+  "widgetType": "PROGRAM_OVERVIEW",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {}
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string", "description": "Contenu Markdown du programme" },
+        "credits": { "type": "integer" },
+        "duration": { "type": "string" },
+        "level": { "type": "string" },
+        "objectives": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "content"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en ingenierie pedagogique pour l'enseignement superieur. A partir des sources fournies, genere une vue d'ensemble de programme au format Markdown. Le document doit inclure : presentation du programme, competences visees, organisation des UE (unites d'enseignement) avec credits ECTS, debouches, modalites d'evaluation. Structure avec des titres (##), tableaux d'UE et listes de competences.",
+    "userPromptTemplate": "Genere une vue d'ensemble de programme a partir du contenu suivant.\n\nTitre: {{title}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), content (string Markdown complet), credits (integer optionnel), duration (string optionnel), level (string optionnel), objectives (array de strings).",
+    "parameters": {
+      "temperature": 0.5,
+      "maxTokens": 8000
+    }
+  },
+
+  "rag": {
+    "topK": 20
+  }
+}

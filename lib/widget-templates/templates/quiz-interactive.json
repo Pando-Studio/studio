@@ -1,0 +1,113 @@
+{
+  "id": "qiplim/quiz-interactive",
+  "name": "Quiz Interactif",
+  "version": "2.0.0",
+  "description": "Quiz à choix multiples avec scoring et explications",
+  "widgetType": "QUIZ",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "questionCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 5,
+          "title": "Nombre de questions"
+        },
+        "optionsPerQuestion": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 6,
+          "default": 4,
+          "title": "Options par question"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["easy", "medium", "hard"],
+          "default": "medium",
+          "title": "Difficulté"
+        }
+      },
+      "required": ["questionCount"]
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier for the question (UUID format)"
+              },
+              "question": {
+                "type": "string",
+                "description": "The quiz question text"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["single", "multiple", "text"],
+                "description": "Question type: single choice, multiple choice, or text"
+              },
+              "options": {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 2,
+                "maxItems": 6,
+                "description": "Array of possible answer texts"
+              },
+              "correctAnswer": {
+                "type": "string",
+                "description": "The correct answer text (must match one of the options)"
+              },
+              "explanation": {
+                "type": "string",
+                "description": "Explanation of the correct answer"
+              },
+              "timeLimit": {
+                "type": "integer",
+                "minimum": 5,
+                "maximum": 300,
+                "description": "Per-question timer in seconds"
+              },
+              "points": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Points awarded for correct answer"
+              },
+              "difficulty": {
+                "type": "string",
+                "enum": ["easy", "medium", "hard"],
+                "description": "Difficulty level"
+              }
+            },
+            "required": ["id", "question", "type", "options", "correctAnswer"]
+          }
+        },
+        "showImmediateFeedback": { "type": "boolean" },
+        "showCorrectAnswer": { "type": "boolean" },
+        "showStatistics": { "type": "boolean" },
+        "showLeaderboard": { "type": "boolean" },
+        "showLiveResults": { "type": "boolean" }
+      },
+      "required": ["questions"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en création de quiz pédagogiques. Tu crées des questions claires, précises et adaptées au niveau demandé. Chaque question a une seule bonne réponse et des distracteurs plausibles. Tu fournis toujours une explication pour la réponse correcte. Tu génères un id UUID unique pour chaque question.",
+    "userPromptTemplate": "Crée un quiz de {{questionCount}} questions sur le sujet: \"{{title}}\"\n{{#description}}Description: {{description}}\n{{/description}}\nNiveau de difficulté: {{difficulty}}\nNombre d'options par question: {{optionsPerQuestion}}\nLangue: {{language}}\n\nContenu de référence:\n{{context}}\n\nInstructions:\n- Chaque question doit avoir un champ 'id' unique (format UUID v4)\n- Chaque question doit avoir un champ 'type' valant 'single'\n- Chaque question doit avoir exactement {{optionsPerQuestion}} options (tableau de strings)\n- Le champ 'correctAnswer' doit contenir le texte exact d'une des options\n- Chaque question doit avoir un champ 'explanation' pour la réponse correcte\n- Chaque question doit avoir un champ 'difficulty' (easy, medium, hard)\n- Chaque question doit avoir un champ 'points' (1 par défaut)\n- Les questions doivent être progressives en difficulté\n- Base-toi uniquement sur le contenu de référence fourni",
+    "parameters": {
+      "temperature": 0.7,
+      "maxTokens": 4000
+    }
+  },
+
+  "rag": {
+    "topK": 10
+  }
+}

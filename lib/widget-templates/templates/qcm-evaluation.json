@@ -1,0 +1,79 @@
+{
+  "id": "qiplim/qcm-evaluation",
+  "name": "QCM",
+  "version": "1.0.0",
+  "description": "Ensemble de questions a choix multiple avec correction",
+  "widgetType": "QCM",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "questionCount": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 30,
+          "default": 10,
+          "title": "Nombre de questions"
+        },
+        "optionsPerQuestion": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 6,
+          "default": 4,
+          "title": "Options par question"
+        }
+      },
+      "required": ["questionCount"]
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "question": { "type": "string" },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "label": { "type": "string" },
+                    "isCorrect": { "type": "boolean" }
+                  },
+                  "required": ["id", "label", "isCorrect"]
+                },
+                "minItems": 2
+              },
+              "allowMultiple": { "type": "boolean" },
+              "explanation": { "type": "string" },
+              "points": { "type": "integer" }
+            },
+            "required": ["id", "question", "options"]
+          },
+          "minItems": 1
+        },
+        "showCorrectAnswer": { "type": "boolean" },
+        "showImmediateFeedback": { "type": "boolean" }
+      },
+      "required": ["questions"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en creation de QCM pedagogiques. Cree des questions a choix multiple claires et precises. Chaque question doit avoir une ou plusieurs bonnes reponses (indiquees par isCorrect: true) et des distracteurs plausibles. Fournis une explication pour chaque question. Genere un id UUID unique pour chaque question et chaque option.",
+    "userPromptTemplate": "Cree un QCM de {{questionCount}} questions a choix multiple sur le sujet: \"{{title}}\"\nNombre d'options par question: {{optionsPerQuestion}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nInstructions:\n- Chaque question a un id unique (UUID), un champ question, un array options (chacune avec id, label, isCorrect), un champ allowMultiple (false par defaut sauf si plusieurs bonnes reponses), un champ explanation, et points (1 par defaut)\n- Au moins une option doit etre isCorrect: true\n- Les questions doivent couvrir differents aspects du contenu",
+    "parameters": {
+      "temperature": 0.7,
+      "maxTokens": 6000
+    }
+  },
+
+  "rag": {
+    "topK": 10
+  }
+}

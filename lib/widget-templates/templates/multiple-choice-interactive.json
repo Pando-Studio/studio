@@ -1,0 +1,105 @@
+{
+  "id": "qiplim/multiple-choice-interactive",
+  "name": "Choix Multiple Interactif",
+  "version": "1.0.0",
+  "description": "Questions a choix multiples avec correction et feedback",
+  "widgetType": "MULTIPLE_CHOICE",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "questionCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 5,
+          "title": "Nombre de questions"
+        },
+        "optionsPerQuestion": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 6,
+          "default": 4,
+          "title": "Options par question"
+        },
+        "allowMultiple": {
+          "type": "boolean",
+          "default": false,
+          "title": "Autoriser les reponses multiples"
+        },
+        "timeLimit": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 300,
+          "title": "Temps limite (secondes)"
+        }
+      },
+      "required": ["questionCount"]
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier for the question (UUID format)"
+              },
+              "question": {
+                "type": "string",
+                "description": "The question text"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique identifier for the option (UUID format)"
+                    },
+                    "label": {
+                      "type": "string",
+                      "description": "The option text"
+                    },
+                    "isCorrect": {
+                      "type": "boolean",
+                      "description": "Whether this option is correct"
+                    }
+                  },
+                  "required": ["id", "label", "isCorrect"]
+                },
+                "minItems": 2,
+                "maxItems": 6
+              },
+              "allowMultiple": {
+                "type": "boolean",
+                "description": "Whether multiple answers can be selected"
+              }
+            },
+            "required": ["id", "question", "options"]
+          }
+        },
+        "showCorrectAnswer": { "type": "boolean" },
+        "timeLimit": { "type": "integer" },
+        "showLiveResults": { "type": "boolean" }
+      },
+      "required": ["questions"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en creation de questionnaires a choix multiples pedagogiques. Tu crees des questions claires avec des options plausibles. Chaque question a au moins une bonne reponse. Les distracteurs sont credibles mais clairement faux pour un expert du sujet. Tu generes un id UUID unique pour chaque question et chaque option.",
+    "userPromptTemplate": "Cree un questionnaire a choix multiples de {{questionCount}} questions sur le sujet: \"{{title}}\"\n{{#description}}Description: {{description}}\n{{/description}}\nOptions par question: {{optionsPerQuestion}}\nReponses multiples autorisees: {{allowMultiple}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nInstructions:\n- Chaque question doit avoir un champ 'id' unique (format UUID v4)\n- Chaque question doit avoir exactement {{optionsPerQuestion}} options\n- Chaque option doit avoir un 'id' unique (format UUID v4), un 'label' et un 'isCorrect' (boolean)\n- Marque les options correctes avec isCorrect: true\n- Le champ 'showCorrectAnswer' doit etre true\n- Le champ 'showLiveResults' doit etre true\n- Base-toi sur le contenu de reference fourni",
+    "parameters": {
+      "temperature": 0.7,
+      "maxTokens": 4000
+    }
+  },
+
+  "rag": { "topK": 10 }
+}

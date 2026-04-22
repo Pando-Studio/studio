@@ -1,0 +1,44 @@
+{
+  "id": "qiplim/session-plan-generation",
+  "name": "Plan de seance",
+  "version": "1.0.0",
+  "description": "Plan detaille d'une seance pedagogique avec objectifs, deroulement et activites",
+  "widgetType": "SESSION_PLAN",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "type": "string",
+          "default": "1h30",
+          "title": "Duree de la seance"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string", "description": "Contenu Markdown du plan de seance" },
+        "duration": { "type": "string" },
+        "objectives": { "type": "array", "items": { "type": "string" } },
+        "materials": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "content"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en ingenierie pedagogique. A partir des sources fournies, genere un plan de seance detaille au format Markdown. Le plan doit inclure : objectifs de la seance, materiel necessaire, deroulement minute par minute (introduction, activites, conclusion), consignes pour chaque phase, modalites d'evaluation formative. Structure le contenu avec des titres (##), sous-titres (###), tableaux horaires et listes.",
+    "userPromptTemplate": "Genere un plan de seance a partir du contenu suivant.\n\nTitre: {{title}}\nDuree: {{duration}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), content (string Markdown complet du plan), duration (string), objectives (array de strings), materials (array de strings).",
+    "parameters": {
+      "temperature": 0.5,
+      "maxTokens": 6000
+    }
+  },
+
+  "rag": {
+    "topK": 15
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "id": "qiplim/report-document",
+  "name": "Rapport",
+  "version": "1.0.0",
+  "description": "Document structure genere a partir des sources (synthese, guide, article, custom)",
+  "widgetType": "REPORT",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["synthesis", "study-guide", "blog-article", "custom"],
+          "default": "synthesis",
+          "title": "Format du rapport"
+        },
+        "instructions": {
+          "type": "string",
+          "title": "Instructions",
+          "description": "Preciser la structure, le style ou le focus"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "format": { "type": "string", "enum": ["synthesis", "study-guide", "blog-article", "custom"] },
+        "content": { "type": "string", "description": "Markdown content of the report" },
+        "wordCount": { "type": "integer" },
+        "sourceCount": { "type": "integer" },
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": { "type": "string" },
+              "sourceId": { "type": "string" },
+              "sourceTitle": { "type": "string" }
+            },
+            "required": ["text"]
+          }
+        }
+      },
+      "required": ["title", "format", "content"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un redacteur expert. Genere un document structure a partir des sources fournies. Adapte le style au format demande:\n- synthesis: apercu des sources avec infos cles et citations\n- study-guide: quiz a reponses courtes, questions de dissertation, glossaire\n- blog-article: article facile a lire avec conclusions\n- custom: suis les instructions de l'utilisateur\n\nLe contenu doit etre en Markdown.",
+    "userPromptTemplate": "Genere un rapport au format '{{format}}'.\n{{#if instructions}}Instructions: {{instructions}}\n{{/if}}\nTitre: {{title}}\nLangue: {{language}}\n\nContenu source:\n{{context}}\n\nGenere un JSON avec les champs: title (string), format (string), content (string Markdown), wordCount (integer), sourceCount (integer).",
+    "parameters": {
+      "temperature": 0.6,
+      "maxTokens": 8000
+    }
+  },
+
+  "rag": {
+    "topK": 20
+  }
+}

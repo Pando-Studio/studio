@@ -1,0 +1,155 @@
+{
+  "id": "qiplim/presentation-from-sources",
+  "name": "Presentation depuis Sources",
+  "version": "1.0.0",
+  "description": "Generates a complete presentation deck plan from source documents with v2 architecture",
+  "widgetType": "PRESENTATION",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "slideCount": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 50,
+          "default": 10,
+          "title": "Nombre de slides",
+          "description": "Nombre total de slides dans la présentation"
+        },
+        "textDensity": {
+          "type": "string",
+          "enum": ["minimal", "balanced", "detailed"],
+          "default": "balanced",
+          "title": "Densité de texte",
+          "description": "Quantité de texte par slide"
+        },
+        "tone": {
+          "type": "string",
+          "enum": ["formel", "professionnel", "decontracte", "pedagogique"],
+          "default": "professionnel",
+          "title": "Ton",
+          "description": "Le ton général de la présentation"
+        },
+        "includeInteractiveWidgets": {
+          "type": "boolean",
+          "default": true,
+          "title": "Inclure des widgets interactifs",
+          "description": "Ajouter des quiz, wordclouds ou autres activités"
+        },
+        "imageSource": {
+          "type": "string",
+          "enum": ["none", "ai", "unsplash"],
+          "default": "ai",
+          "title": "Source des images",
+          "description": "Comment générer les images (none, IA, ou Unsplash)"
+        },
+        "targetAudience": {
+          "type": "string",
+          "title": "Public cible",
+          "description": "Description du public cible de la présentation"
+        },
+        "duration": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 120,
+          "title": "Durée (minutes)",
+          "description": "Durée estimée de la présentation en minutes"
+        },
+        "learningObjectives": {
+          "type": "array",
+          "items": { "type": "string" },
+          "title": "Objectifs pédagogiques",
+          "description": "Liste des objectifs d'apprentissage"
+        }
+      },
+      "required": ["slideCount"]
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Titre de la présentation"
+        },
+        "narrative": {
+          "type": "string",
+          "description": "Arc narratif global de la présentation"
+        },
+        "targetAudience": {
+          "type": "string",
+          "description": "Public cible identifié"
+        },
+        "learningObjectives": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Objectifs pédagogiques de la présentation"
+        },
+        "estimatedDuration": {
+          "type": "integer",
+          "description": "Durée estimée en minutes"
+        },
+        "slides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "order": {
+                "type": "integer",
+                "description": "Ordre de la slide (1-indexed)"
+              },
+              "title": {
+                "type": "string",
+                "description": "Titre de la slide"
+              },
+              "intent": {
+                "type": "string",
+                "enum": ["title", "section", "content", "summary", "interactive"],
+                "description": "Intent de la slide"
+              },
+              "keyPoints": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Points clés à couvrir sur cette slide"
+              },
+              "suggestedLayout": {
+                "type": "string",
+                "enum": ["simple", "two-columns", "media-left", "media-right", "media-center", "full-media"],
+                "description": "Layout suggéré"
+              },
+              "hasImage": {
+                "type": "boolean",
+                "description": "Cette slide contient-elle une image?"
+              },
+              "hasActivity": {
+                "type": "boolean",
+                "description": "Cette slide contient-elle une activité interactive?"
+              },
+              "activityType": {
+                "type": "string",
+                "enum": ["quiz", "wordcloud", "postit"],
+                "description": "Type d'activité si hasActivity est true"
+              }
+            },
+            "required": ["order", "title", "intent", "keyPoints"]
+          },
+          "description": "Liste des slides avec leurs résumés"
+        }
+      },
+      "required": ["title", "narrative", "slides"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en ingénierie pédagogique et en design de présentations. Tu crées des DeckPlans structurés qui définissent l'arc narratif complet d'une présentation.\n\nRègles pour le DeckPlan:\n1. TOUJOURS commencer par une slide 'title' (intent: title)\n2. Utiliser des slides 'section' pour marquer les grandes parties\n3. Les slides 'content' portent le contenu principal\n4. Terminer par une slide 'summary' si approprié\n5. Placer les slides 'interactive' stratégiquement (après concepts clés)\n\nStructure recommandée:\n- Slide 1: Title (titre principal + sous-titre)\n- Slide 2-3: Introduction/contexte\n- Slides 4-N-2: Contenu principal avec sections\n- Slide N-1: Synthèse ou activité finale\n- Slide N: Conclusion/Questions\n\nPour les activités interactives:\n- 'quiz' après un bloc de contenu dense pour vérifier la compréhension\n- 'wordcloud' pour recueillir des opinions ou brainstormer\n- 'postit' pour des réflexions individuelles ou travail de groupe\n\nPour les layouts:\n- 'simple': titre + quelques points ou paragraphe\n- 'two-columns': comparaison, avantages/inconvénients\n- 'media-left/right': image + explication\n- 'media-center': image centrale avec légende\n- 'full-media': slide visuelle immersive\n\nLe narrative doit décrire le fil rouge de la présentation en 2-3 phrases.",
+    "userPromptTemplate": "Crée un DeckPlan complet pour une présentation avec les paramètres suivants:\n\nTitre: {{title}}\n{{#description}}Description: {{description}}\n{{/description}}\nNombre de slides: {{slideCount}}\nDensité de texte: {{textDensity}}\nTon: {{tone}}\nInclure des activités interactives: {{includeInteractiveWidgets}}\nSource d'images: {{imageSource}}\n{{#targetAudience}}Public cible: {{targetAudience}}\n{{/targetAudience}}\n{{#duration}}Durée prévue: {{duration}} minutes\n{{/duration}}\n{{#learningObjectives}}Objectifs pédagogiques:\n{{#each learningObjectives}}- {{this}}\n{{/each}}{{/learningObjectives}}\nLangue: {{language}}\n\nContenu source à utiliser:\n{{context}}\n\nInstructions:\n1. Génère exactement {{slideCount}} slides\n2. Assure une progression logique et pédagogique\n3. Varie les layouts pour maintenir l'attention\n4. Inclus {{#if includeInteractiveWidgets}}2-3 activités interactives bien placées{{else}}aucune activité interactive{{/if}}\n5. {{#if imageSource}}Suggère des images pour les slides appropriées{{/if}}\n6. Les keyPoints doivent être spécifiques et actionnables\n\nGénère le DeckPlan complet en JSON.",
+    "parameters": {
+      "temperature": 0.7,
+      "maxTokens": 4000
+    }
+  },
+
+  "rag": {
+    "topK": 20
+  }
+}

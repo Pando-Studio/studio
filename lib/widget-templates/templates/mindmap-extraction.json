@@ -1,0 +1,72 @@
+{
+  "id": "qiplim/mindmap-extraction",
+  "name": "Carte mentale",
+  "version": "1.0.0",
+  "description": "Carte mentale hierarchique extraite des sources",
+  "widgetType": "MINDMAP",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "maxDepth": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 5,
+          "default": 3,
+          "title": "Profondeur maximale"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "root": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "label": { "type": "string" },
+            "children": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "label": { "type": "string" },
+                  "children": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "label": { "type": "string" }
+                      },
+                      "required": ["id", "label"]
+                    }
+                  }
+                },
+                "required": ["id", "label"]
+              }
+            }
+          },
+          "required": ["id", "label"]
+        }
+      },
+      "required": ["title", "root"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un expert en organisation de l'information. A partir du contenu fourni, cree une carte mentale hierarchique avec un noeud racine et des branches structurees. Genere un id unique pour chaque noeud (format: n1, n2, etc.). Les labels doivent etre courts (2-5 mots).",
+    "userPromptTemplate": "A partir du contenu suivant, genere une carte mentale (profondeur max: {{maxDepth}}).\n\nTitre: {{title}}\nLangue: {{language}}\n\nContenu de reference:\n{{context}}\n\nGenere un JSON avec les champs: title (string), root (objet avec id, label, children recursif).",
+    "parameters": {
+      "temperature": 0.5,
+      "maxTokens": 4000
+    }
+  },
+
+  "rag": {
+    "topK": 10
+  }
+}

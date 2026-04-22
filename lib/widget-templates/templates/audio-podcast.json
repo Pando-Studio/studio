@@ -1,0 +1,103 @@
+{
+  "id": "qiplim/audio-podcast",
+  "name": "Podcast educatif",
+  "version": "1.0.0",
+  "description": "Genere un podcast educatif a 2 voix a partir des sources du studio",
+  "widgetType": "AUDIO",
+
+  "schema": {
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "targetDuration": {
+          "type": "string",
+          "enum": ["3", "5", "10", "15"],
+          "default": "5",
+          "description": "Duree cible en minutes"
+        },
+        "tone": {
+          "type": "string",
+          "enum": ["casual", "professional", "academic"],
+          "default": "professional",
+          "description": "Ton du podcast"
+        },
+        "style": {
+          "type": "string",
+          "enum": ["interview", "discussion", "lecture", "debate"],
+          "default": "discussion",
+          "description": "Style du podcast"
+        },
+        "speakerCount": {
+          "type": "string",
+          "enum": ["1", "2"],
+          "default": "2",
+          "description": "Nombre de voix"
+        }
+      }
+    },
+    "activitySpec": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "language": { "type": "string" },
+        "estimatedDuration": { "type": "number" },
+        "voices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "role": { "type": "string", "enum": ["host", "expert", "narrator"] }
+            },
+            "required": ["id", "name", "role"]
+          }
+        },
+        "script": {
+          "type": "object",
+          "properties": {
+            "segments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "speakerId": { "type": "string" },
+                  "text": { "type": "string" },
+                  "type": { "type": "string", "enum": ["intro", "discussion", "example", "summary", "transition", "outro"] }
+                },
+                "required": ["id", "speakerId", "text", "type"]
+              }
+            },
+            "chapters": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "startSegmentId": { "type": "string" }
+                },
+                "required": ["title", "startSegmentId"]
+              }
+            }
+          },
+          "required": ["segments"]
+        }
+      },
+      "required": ["title", "voices", "script"]
+    }
+  },
+
+  "generation": {
+    "systemPrompt": "Tu es un scriptwriter pour des podcasts educatifs. Tu crees des dialogues engageants entre 2 hotes qui discutent d'un sujet a partir d'un document source.\n\nREGLES DU DIALOGUE :\n- 2 hotes : un animateur principal (id: \"host\", role: \"host\") qui pose les questions et guide, et un expert (id: \"expert\", role: \"expert\") qui approfondit et donne des exemples.\n- Ton : {{tone}} (casual = decontracte, professional = informatif, academic = rigoureux)\n- Duree cible : {{targetDuration}} minutes\n- Langue : {{language}}\n\nSTRUCTURE :\n1. INTRO (30s) : l'animateur accueille, presente le sujet, teaser des points cles\n2. CONTEXTE (1-2 min) : l'expert pose le cadre\n3. POINTS CLES (60-70% du temps) : alternance de questions (host) et explications (expert), avec des exemples concrets et analogies\n4. REACTIONS NATURELLES : inclure des \"Exactement !\", \"C'est interessant...\", \"Attends, je reformule...\" pour que ca sonne naturel\n5. RESUME (1 min) : l'animateur recapitule les 3-5 points essentiels\n6. OUTRO (30s) : remerciements\n\nCONTRAINTES :\n- Chaque segment fait 1 a 4 phrases max\n- Alterner les speakers toutes les 2-3 phrases\n- Ne PAS inventer d'informations absentes du document source\n- Inclure au moins 2 exemples concrets ou analogies\n- Definir les termes techniques la premiere fois\n\nESTIMATION : ~150 mots par minute de dialogue.\n\nFORMAT : JSON conforme au schema activitySpec.",
+    "userPromptTemplate": "Sujet : {{title}}\nLangue : {{language}}\nDuree cible : {{targetDuration}} minutes\nStyle : {{style}}\n\nContenu source :\n{{context}}\n\nGenere un JSON avec : title, language, estimatedDuration (en minutes), voices (array de 2 speakers), script (segments avec id/speakerId/text/type, et chapters optionnels).",
+    "parameters": {
+      "temperature": 0.8,
+      "maxTokens": 8000
+    }
+  },
+
+  "rag": {
+    "topK": 20
+  }
+}

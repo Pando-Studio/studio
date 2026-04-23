@@ -21,8 +21,6 @@ import {
   Github,
   Key,
   Accessibility,
-  Building2,
-  Landmark,
   HelpCircle,
   ChevronRight,
   Monitor,
@@ -352,55 +350,6 @@ export default function EducationPage() {
                 </p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================== */}
-      {/*  Institutions                                                      */}
-      {/* ================================================================== */}
-      <section className="py-20 sm:py-28 bg-landing-brand-light">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl tracking-tight mb-4 text-landing-text animate-fade-up">
-            {t('institutions.title')}
-          </h2>
-          <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto animate-fade-up animation-delay-150">
-            {t('institutions.subtitle')}
-          </p>
-
-          <div className="grid sm:grid-cols-3 gap-6 animate-fade-up animation-delay-300">
-            {/* Pays de la Loire */}
-            <div className="p-6 bg-white border border-landing-border rounded-lg">
-              <div className="w-12 h-12 rounded-xl bg-landing-brand-subtle flex items-center justify-center mx-auto mb-4">
-                <Landmark className="w-6 h-6 text-landing-brand" />
-              </div>
-              <h3 className="font-display font-bold text-landing-text mb-1">
-                {t('institutions.paysLoire')}
-              </h3>
-              <p className="text-sm text-muted-foreground">{t('institutions.paysLoireDesc')}</p>
-            </div>
-
-            {/* Ecole de Design */}
-            <div className="p-6 bg-white border border-landing-border rounded-lg">
-              <div className="w-12 h-12 rounded-xl bg-landing-brand-subtle flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="w-6 h-6 text-landing-brand" />
-              </div>
-              <h3 className="font-display font-bold text-landing-text mb-1">
-                {t('institutions.ecoleDesign')}
-              </h3>
-              <p className="text-sm text-muted-foreground">{t('institutions.ecoleDesignDesc')}</p>
-            </div>
-
-            {/* Placeholder */}
-            <div className="p-6 bg-white/50 border border-dashed border-landing-border rounded-lg">
-              <div className="w-12 h-12 rounded-xl bg-landing-brand-subtle flex items-center justify-center mx-auto mb-4">
-                <Building2 className="w-6 h-6 text-landing-brand" />
-              </div>
-              <h3 className="font-display font-bold text-muted-foreground mb-1">
-                {t('institutions.placeholder')}
-              </h3>
-              <p className="text-sm text-muted-foreground">{t('institutions.placeholderDesc')}</p>
-            </div>
           </div>
         </div>
       </section>

@@ -176,16 +176,6 @@
       "accessible": "Accessible",
       "accessibleDesc": "Designed for all learners. Screen reader compatible. Keyboard navigation."
     },
-    "institutions": {
-      "title": "Designed for institutions",
-      "subtitle": "Trusted by schools and regional education authorities.",
-      "paysLoire": "Pays de la Loire Region",
-      "paysLoireDesc": "High school network",
-      "ecoleDesign": "L'Ecole de Design Nantes Atlantique",
-      "ecoleDesignDesc": "Higher education",
-      "placeholder": "Your institution",
-      "placeholderDesc": "Contact us"
-    },
     "cta": {
       "title": "Transform your teaching",
       "subtitle": "From documents to interactive sessions in minutes.",

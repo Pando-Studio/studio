@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getStudioAuthContext } from '@/lib/api/auth-context';
 import { logger } from '@/lib/monitoring/logger';
-import { generatePodcastAudio, generateVideoNarration } from '@/lib/ai/tts';
+import { generatePodcastAudio, generateVideoNarration, type TTSProviderKey } from '@/lib/ai/tts';
 import { publishStudioEvent } from '@/lib/events/studio-events';
 
 type RouteParams = { params: Promise<{ id: string; widgetId: string }> };
@@ -29,6 +29,10 @@ export async function POST(request: Request, { params }: RouteParams) {
     const widgetData = widget.data as Record<string, unknown>;
     const body = await request.json();
     const mode = body.mode as string | undefined;
+    const genConfig = (widgetData.generationConfig as Record<string, unknown>) ?? {};
+    const ttsProvider = (body.ttsProvider as TTSProviderKey)
+      || (genConfig.ttsProvider as TTSProviderKey)
+      || 'openai';
 
     // Video narration mode
     if (mode === 'video-narration' || widget.type === 'VIDEO') {
@@ -37,7 +41,7 @@ export async function POST(request: Request, { params }: RouteParams) {
         return NextResponse.json({ error: 'Pas de storyboard disponible. Generez d\'abord le script.' }, { status: 400 });
       }
 
-      const result = await generateVideoNarration(script.slides, studioId);
+      const result = await generateVideoNarration(script.slides, studioId, ttsProvider);
 
       // Update slides with audio URLs
       const updatedSlides = script.slides.map((slide) => ({
@@ -82,7 +86,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     const voices = widgetData.voices as Array<{ id: string; name: string; role: string }> | undefined;
-    const result = await generatePodcastAudio(script, voices, studioId);
+    const result = await generatePodcastAudio(script, voices, studioId, ttsProvider);
 
     const updatedData = {
       ...widgetData,

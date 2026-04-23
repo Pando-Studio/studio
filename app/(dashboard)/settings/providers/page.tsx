@@ -20,7 +20,7 @@ interface ProviderConfig {
   createdAt: string;
 }
 
-const PROVIDER_KEYS = ['mistral', 'openai', 'anthropic', 'google'] as const;
+const PROVIDER_KEYS = ['mistral', 'openai', 'anthropic', 'google', 'elevenlabs'] as const;
 type ProviderKey = (typeof PROVIDER_KEYS)[number];
 
 export default function ProvidersPage() {
@@ -147,9 +147,11 @@ export default function ProvidersPage() {
                       <h3 className="font-semibold">{info.name}</h3>
                       <p className="text-sm text-muted-foreground">{info.description}</p>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        <span className="text-xs text-muted-foreground">
-                          Chat: {info.models.chat}
-                        </span>
+                        {info.models.chat && (
+                          <span className="text-xs text-muted-foreground">
+                            Chat: {info.models.chat}
+                          </span>
+                        )}
                         {info.models.embedding && (
                           <span className="text-xs text-muted-foreground">
                             | Embedding: {info.models.embedding}

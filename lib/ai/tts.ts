@@ -1,12 +1,18 @@
 /**
  * Text-to-Speech service for podcast and video narration generation.
- * Uses OpenAI TTS API as default provider.
- * Supports BYOK key resolution (studio → user → env).
+ * Supports multiple TTS providers: OpenAI, Mistral, ElevenLabs, Gemini.
+ * Uses BYOK key resolution (studio → user → env).
  */
 
 import { uploadToS3, generateS3Key } from '../s3';
-import { getApiKeyForProvider } from './providers';
+import { getApiKeyForProvider, type ProviderKey } from './providers';
 import { logger } from '../monitoring/logger';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export type TTSProviderKey = 'openai' | 'mistral' | 'elevenlabs' | 'gemini';
 
 export interface TTSResult {
   audioBuffer: Buffer;
@@ -21,16 +27,48 @@ export interface PodcastAudioResult {
   transcript: string;
 }
 
-// Default voice mapping for podcast roles
-const DEFAULT_VOICES: Record<string, string> = {
-  host: 'nova',
-  expert: 'onyx',
-  narrator: 'alloy',
+// ---------------------------------------------------------------------------
+// Provider → API key mapping
+// ---------------------------------------------------------------------------
+
+const TTS_TO_PROVIDER_KEY: Record<TTSProviderKey, ProviderKey> = {
+  openai: 'openai',
+  mistral: 'mistral',
+  elevenlabs: 'elevenlabs',
+  gemini: 'google',
 };
 
-/**
- * Generate speech for a single text segment using OpenAI TTS.
- */
+// ---------------------------------------------------------------------------
+// Voice mappings per provider
+// ---------------------------------------------------------------------------
+
+const VOICE_MAP: Record<TTSProviderKey, Record<string, string>> = {
+  openai: { host: 'nova', expert: 'onyx', narrator: 'alloy' },
+  mistral: { host: 'jessica', expert: 'alex', narrator: 'emma' },
+  elevenlabs: {
+    host: '21m00Tcm4TlvDq8ikWAM',     // Rachel
+    expert: 'pNInz6obpgDQGcFmaJgB',    // Adam
+    narrator: 'EXAVITQu4vr4xnSDxMaL',  // Bella
+  },
+  gemini: { host: 'Kore', expert: 'Charon', narrator: 'Aoede' },
+};
+
+const TTS_MODEL_NAMES: Record<TTSProviderKey, string> = {
+  openai: 'tts-1',
+  mistral: 'mistral-tts-latest',
+  elevenlabs: 'eleven_multilingual_v2',
+  gemini: 'google-cloud-tts',
+};
+
+// ---------------------------------------------------------------------------
+// Provider adapters
+// ---------------------------------------------------------------------------
+
+function estimateDurationMs(text: string): number {
+  const wordCount = text.split(/\s+/).length;
+  return (wordCount / 150) * 60 * 1000;
+}
+
 async function generateWithOpenAITTS(
   text: string,
   voiceId: string,
@@ -56,18 +94,137 @@ async function generateWithOpenAITTS(
   }
 
   const arrayBuffer = await response.arrayBuffer();
-  const audioBuffer = Buffer.from(arrayBuffer);
-
-  // Estimate duration: ~150 words per minute, average word = 5 chars
-  const wordCount = text.split(/\s+/).length;
-  const durationEstimateMs = (wordCount / 150) * 60 * 1000;
-
   return {
-    audioBuffer,
-    durationEstimateMs,
+    audioBuffer: Buffer.from(arrayBuffer),
+    durationEstimateMs: estimateDurationMs(text),
     model: 'tts-1',
   };
 }
+
+async function generateWithMistralTTS(
+  text: string,
+  voiceId: string,
+  apiKey: string,
+): Promise<TTSResult> {
+  const response = await fetch('https://api.mistral.ai/v1/audio/speech', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'mistral-tts-latest',
+      voice: voiceId,
+      input: text,
+      response_format: 'mp3',
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Mistral TTS failed: ${response.status} - ${errorText}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  return {
+    audioBuffer: Buffer.from(arrayBuffer),
+    durationEstimateMs: estimateDurationMs(text),
+    model: 'mistral-tts-latest',
+  };
+}
+
+async function generateWithElevenLabsTTS(
+  text: string,
+  voiceId: string,
+  apiKey: string,
+): Promise<TTSResult> {
+  const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': apiKey,
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
+    },
+    body: JSON.stringify({
+      text,
+      model_id: 'eleven_multilingual_v2',
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.75,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`ElevenLabs TTS failed: ${response.status} - ${errorText}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  return {
+    audioBuffer: Buffer.from(arrayBuffer),
+    durationEstimateMs: estimateDurationMs(text),
+    model: 'eleven_multilingual_v2',
+  };
+}
+
+async function generateWithGeminiTTS(
+  text: string,
+  voiceId: string,
+  apiKey: string,
+): Promise<TTSResult> {
+  const response = await fetch(
+    `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        input: { text },
+        voice: { languageCode: 'fr-FR', name: voiceId },
+        audioConfig: { audioEncoding: 'MP3' },
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Gemini TTS failed: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  const audioBuffer = Buffer.from(data.audioContent, 'base64');
+  return {
+    audioBuffer,
+    durationEstimateMs: estimateDurationMs(text),
+    model: 'google-cloud-tts',
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Dispatcher
+// ---------------------------------------------------------------------------
+
+function generateSpeech(
+  text: string,
+  voiceId: string,
+  apiKey: string,
+  provider: TTSProviderKey,
+): Promise<TTSResult> {
+  switch (provider) {
+    case 'openai':
+      return generateWithOpenAITTS(text, voiceId, apiKey);
+    case 'mistral':
+      return generateWithMistralTTS(text, voiceId, apiKey);
+    case 'elevenlabs':
+      return generateWithElevenLabsTTS(text, voiceId, apiKey);
+    case 'gemini':
+      return generateWithGeminiTTS(text, voiceId, apiKey);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 /**
  * Generate a single TTS segment and return audio buffer.
@@ -77,13 +234,15 @@ export async function generateTTS(
   text: string,
   voiceId: string,
   studioId: string,
+  ttsProvider: TTSProviderKey = 'openai',
 ): Promise<TTSResult> {
-  const apiKey = await getApiKeyForProvider(studioId, 'openai');
+  const providerKey = TTS_TO_PROVIDER_KEY[ttsProvider];
+  const apiKey = await getApiKeyForProvider(studioId, providerKey);
   if (!apiKey) {
-    throw new Error('Pas de cle API OpenAI disponible pour la generation TTS');
+    throw new Error(`Pas de cle API ${ttsProvider} disponible pour la generation TTS`);
   }
 
-  return generateWithOpenAITTS(text, voiceId, apiKey);
+  return generateSpeech(text, voiceId, apiKey, ttsProvider);
 }
 
 /**
@@ -96,25 +255,28 @@ export async function generatePodcastAudio(
   },
   voices: Array<{ id: string; name: string; role: string }> | undefined,
   studioId: string,
+  ttsProvider: TTSProviderKey = 'openai',
 ): Promise<PodcastAudioResult> {
-  const apiKey = await getApiKeyForProvider(studioId, 'openai');
+  const providerKey = TTS_TO_PROVIDER_KEY[ttsProvider];
+  const apiKey = await getApiKeyForProvider(studioId, providerKey);
   if (!apiKey) {
-    throw new Error('Pas de cle API OpenAI disponible pour la generation TTS');
+    throw new Error(`Pas de cle API ${ttsProvider} disponible pour la generation TTS`);
   }
 
+  const voiceMap = VOICE_MAP[ttsProvider];
+  const modelName = TTS_MODEL_NAMES[ttsProvider];
   const audioBuffers: Buffer[] = [];
   let totalDurationMs = 0;
   const transcriptParts: string[] = [];
 
   for (const segment of script.segments) {
-    // Resolve voice for this speaker
     const voice = voices?.find((v) => v.id === segment.speakerId);
-    const voiceId = DEFAULT_VOICES[voice?.role ?? 'narrator'] ?? 'alloy';
+    const voiceId = voiceMap[voice?.role ?? 'narrator'] ?? voiceMap.narrator;
     const speakerName = voice?.name ?? segment.speakerId;
 
-    logger.info(`[TTS] Generating segment ${segment.id} for ${speakerName} (voice: ${voiceId})`);
+    logger.info(`[TTS:${ttsProvider}] Generating segment ${segment.id} for ${speakerName} (voice: ${voiceId})`);
 
-    const result = await generateWithOpenAITTS(segment.text, voiceId, apiKey);
+    const result = await generateSpeech(segment.text, voiceId, apiKey, ttsProvider);
     audioBuffers.push(result.audioBuffer);
     totalDurationMs += result.durationEstimateMs;
     transcriptParts.push(`${speakerName}: ${segment.text}`);
@@ -131,7 +293,7 @@ export async function generatePodcastAudio(
   return {
     audioUrl: s3Result.url,
     durationSeconds: Math.round(totalDurationMs / 1000),
-    model: 'tts-1',
+    model: modelName,
     transcript: transcriptParts.join('\n'),
   };
 }
@@ -143,17 +305,22 @@ export async function generatePodcastAudio(
 export async function generateVideoNarration(
   slides: Array<{ id: string; narration: string }>,
   studioId: string,
+  ttsProvider: TTSProviderKey = 'openai',
 ): Promise<{
   slideAudioUrls: Record<string, string>;
   totalDurationSeconds: number;
   model: string;
   transcript: string;
 }> {
-  const apiKey = await getApiKeyForProvider(studioId, 'openai');
+  const providerKey = TTS_TO_PROVIDER_KEY[ttsProvider];
+  const apiKey = await getApiKeyForProvider(studioId, providerKey);
   if (!apiKey) {
-    throw new Error('Pas de cle API OpenAI disponible pour la generation TTS');
+    throw new Error(`Pas de cle API ${ttsProvider} disponible pour la generation TTS`);
   }
 
+  const voiceMap = VOICE_MAP[ttsProvider];
+  const modelName = TTS_MODEL_NAMES[ttsProvider];
+  const narratorVoice = voiceMap.narrator;
   const slideAudioUrls: Record<string, string> = {};
   let totalDurationMs = 0;
   const transcriptParts: string[] = [];
@@ -161,9 +328,9 @@ export async function generateVideoNarration(
   for (const slide of slides) {
     if (!slide.narration) continue;
 
-    logger.info(`[TTS] Generating narration for slide ${slide.id}`);
+    logger.info(`[TTS:${ttsProvider}] Generating narration for slide ${slide.id}`);
 
-    const result = await generateWithOpenAITTS(slide.narration, 'alloy', apiKey);
+    const result = await generateSpeech(slide.narration, narratorVoice, apiKey, ttsProvider);
     totalDurationMs += result.durationEstimateMs;
     transcriptParts.push(slide.narration);
 
@@ -177,7 +344,7 @@ export async function generateVideoNarration(
   return {
     slideAudioUrls,
     totalDurationSeconds: Math.round(totalDurationMs / 1000),
-    model: 'tts-1',
+    model: modelName,
     transcript: transcriptParts.join('\n\n'),
   };
 }

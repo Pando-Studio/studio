@@ -729,41 +729,44 @@ export function ChatPanel() {
               <Sparkles className="h-8 w-8 text-yellow-600" />
             </div>
             <h3 className="text-lg font-semibold mb-2">
-              Bienvenue dans votre Studio
+              {isViewer ? 'Posez vos questions' : 'Bienvenue dans votre Studio'}
             </h3>
             <p className="text-muted-foreground max-w-md mb-6">
-              Posez des questions sur vos sources, generez du contenu interactif,
-              ou laissez l&apos;IA vous aider a planifier vos formations.
+              {isViewer
+                ? 'Discutez avec l\u2019IA pour explorer le contenu de ce studio. Posez des questions sur les sources et les widgets disponibles.'
+                : 'Posez des questions sur vos sources, generez du contenu interactif, ou laissez l\u2019IA vous aider a planifier vos formations.'}
             </p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-gray-300 hover:bg-yellow-50 hover:border-primary"
-                onClick={() => sendMessage('Resume les points cles de mes sources')}
-                disabled={isLoading}
-              >
-                Resumer les sources
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-gray-300 hover:bg-yellow-50 hover:border-primary"
-                onClick={() => sendMessage('Genere un quiz sur le contenu')}
-                disabled={isLoading}
-              >
-                Generer un quiz
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-gray-300 hover:bg-yellow-50 hover:border-primary"
-                onClick={() => sendMessage('Cree un nuage de mots')}
-                disabled={isLoading}
-              >
-                Nuage de mots
-              </Button>
-            </div>
+            {!isViewer && (
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-300 hover:bg-yellow-50 hover:border-primary"
+                  onClick={() => sendMessage('Resume les points cles de mes sources')}
+                  disabled={isLoading}
+                >
+                  Resumer les sources
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-300 hover:bg-yellow-50 hover:border-primary"
+                  onClick={() => sendMessage('Genere un quiz sur le contenu')}
+                  disabled={isLoading}
+                >
+                  Generer un quiz
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-300 hover:bg-yellow-50 hover:border-primary"
+                  onClick={() => sendMessage('Cree un nuage de mots')}
+                  disabled={isLoading}
+                >
+                  Nuage de mots
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getStudioAuthContext } from '@/lib/api/auth-context';
+import { getStudioAuthContext, getPublicStudioAccess } from '@/lib/api/auth-context';
 import { logger } from '@/lib/monitoring/logger';
 import { validateBody, updateWidgetSchema } from '@/lib/api/schemas';
 import { publishStudioEvent } from '@/lib/events/studio-events';
@@ -12,7 +12,7 @@ export async function GET(request: Request, { params }: RouteParams) {
   try {
     const { id: studioId, widgetId } = await params;
 
-    const ctx = await getStudioAuthContext(studioId);
+    const ctx = await getPublicStudioAccess(studioId);
     if ('error' in ctx) {
       return NextResponse.json({ error: ctx.error }, { status: ctx.status });
     }

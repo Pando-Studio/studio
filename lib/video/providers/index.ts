@@ -3,12 +3,31 @@ import { KlingProvider } from './kling';
 import { RunwayProvider } from './runway';
 
 export type { CinematicProvider, CinematicClip, CinematicSection } from './types';
+export { CinematicFatalError } from './types';
 
 export function getCinematicProvider(providerName: string): CinematicProvider {
   switch (providerName) {
     case 'kling': {
-      const accessKey = process.env.KLING_ACCESS_KEY;
-      const secretKey = process.env.KLING_SECRET_KEY;
+      let accessKey = process.env.KLING_ACCESS_KEY;
+      let secretKey = process.env.KLING_SECRET_KEY;
+      // Fallback: read from .env file directly if not in process.env (instrumentation workers)
+      if (!accessKey || !secretKey) {
+        try {
+          const fs = require('fs');
+          const path = require('path');
+          const envPath = path.resolve(process.cwd(), '.env');
+          const envContent = fs.readFileSync(envPath, 'utf-8');
+          for (const line of envContent.split('\n')) {
+            const match = line.match(/^(KLING_ACCESS_KEY|KLING_SECRET_KEY)=(.+)$/);
+            if (match) {
+              if (match[1] === 'KLING_ACCESS_KEY') accessKey = match[2].trim();
+              if (match[1] === 'KLING_SECRET_KEY') secretKey = match[2].trim();
+            }
+          }
+        } catch {
+          // .env file not available
+        }
+      }
       if (!accessKey || !secretKey) {
         throw new Error(
           'Kling API requires KLING_ACCESS_KEY and KLING_SECRET_KEY in environment. ' +

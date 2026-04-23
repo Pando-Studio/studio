@@ -21,3 +21,14 @@ export interface CinematicSection {
   durationHint: number;
   audioUrl?: string;
 }
+
+/**
+ * Fatal error that should abort the entire cinematic generation immediately.
+ * Used for billing issues, auth failures, etc. — no point retrying other clips.
+ */
+export class CinematicFatalError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CinematicFatalError';
+  }
+}

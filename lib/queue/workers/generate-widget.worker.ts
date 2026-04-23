@@ -329,14 +329,37 @@ async function processJob(
             provider: cinematicProviderName,
           });
         } catch (renderError) {
+          const errMsg = renderError instanceof Error ? renderError.message : String(renderError);
+          // Check if this is a fatal error (billing, auth) — mark run as FAILED
+          const { CinematicFatalError } = await import('../../video/providers');
+          const isFatal = renderError instanceof CinematicFatalError
+            || errMsg.includes('Account balance')
+            || errMsg.includes('All') && errMsg.includes('clips failed');
+
+          if (isFatal) {
+            await prisma.generationRun.update({
+              where: { id: runId },
+              data: {
+                status: 'FAILED',
+                errorLog: errMsg,
+                metadata: { step: 'failed', label: errMsg, progress: 0 },
+              },
+            });
+            await prisma.widget.update({
+              where: { id: widgetId },
+              data: { status: 'FAILED' },
+            });
+            logger.error('Cinematic generation FAILED (fatal)', { runId, error: errMsg });
+            // Skip the rest of the generation pipeline
+            return;
+          }
+
+          // Non-fatal: log warning, continue with storyboard-only
           await prisma.generationRun.update({
             where: { id: runId },
-            data: { errorLog: `Cinematic assembly failed: ${renderError instanceof Error ? renderError.message : String(renderError)}` },
+            data: { errorLog: `Cinematic assembly failed: ${errMsg}` },
           });
-          logger.warn('Cinematic video assembly failed', {
-            runId,
-            error: renderError instanceof Error ? renderError.message : String(renderError),
-          });
+          logger.warn('Cinematic video assembly failed (non-fatal)', { runId, error: errMsg });
         }
       } else if (hasAudio) {
         // SLIDESHOW MODE: render slides + audio into MP4 with Remotion

@@ -1,4 +1,5 @@
 import type { CinematicProvider, CinematicClip } from './types';
+import { CinematicFatalError } from './types';
 import { logger } from '../../monitoring/logger';
 import { SignJWT } from 'jose';
 
@@ -7,7 +8,7 @@ const COST_PER_SECOND = 0.084; // standard pricing per unit ($0.14) × 0.6 units
 
 /**
  * Generate a JWT token for Kling API authentication.
- * Uses HS256 with the secret key, includes access key as issuer.
+ * Token is regenerated per request to avoid expiry issues during long polling.
  */
 async function generateKlingToken(accessKey: string, secretKey: string): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
@@ -68,34 +69,58 @@ export class KlingProvider implements CinematicProvider {
 
     if (!createRes.ok) {
       const err = await createRes.text();
+      logger.error('Kling: task creation failed', { status: createRes.status, error: err });
+      // Fatal errors: billing, auth — abort immediately, don't retry other clips
+      if (createRes.status === 429 || createRes.status === 401 || createRes.status === 403) {
+        const parsed = JSON.parse(err).message || err;
+        throw new CinematicFatalError(`Kling: ${parsed}`);
+      }
       throw new Error(`Kling API error: ${createRes.status} ${err}`);
     }
 
     const createData = await createRes.json();
     const taskId = createData.data?.task_id;
-    if (!taskId) throw new Error('Kling: no task_id returned');
+    if (!taskId) {
+      logger.error('Kling: no task_id in response', { response: JSON.stringify(createData).slice(0, 500) });
+      throw new Error('Kling: no task_id returned');
+    }
 
     logger.info('Kling: task created', { taskId });
 
     // Poll for completion (up to 10 min)
+    let consecutiveErrors = 0;
     for (let i = 0; i < 120; i++) {
       await new Promise((r) => setTimeout(r, 5000));
 
+      // Fresh token for each poll to avoid JWT expiry
       const pollAuth = await this.getAuthHeader();
       const pollRes = await fetch(`${KLING_API_URL}/videos/text2video/${taskId}`, {
         headers: { 'Authorization': pollAuth },
       });
 
-      if (!pollRes.ok) continue;
+      if (!pollRes.ok) {
+        consecutiveErrors++;
+        const errText = await pollRes.text().catch(() => '');
+        logger.warn('Kling: poll request failed', { taskId, status: pollRes.status, error: errText, consecutiveErrors });
+        // Abort after 5 consecutive poll failures
+        if (consecutiveErrors >= 5) {
+          throw new Error(`Kling: polling failed ${consecutiveErrors} times consecutively (last: ${pollRes.status})`);
+        }
+        continue;
+      }
+      consecutiveErrors = 0;
 
       const pollData = await pollRes.json();
       const status = pollData.data?.task_status;
 
       if (status === 'succeed') {
         const videoUrl = pollData.data?.task_result?.videos?.[0]?.url;
-        if (!videoUrl) throw new Error('Kling: no video URL in result');
+        if (!videoUrl) {
+          logger.error('Kling: succeed but no video URL', { taskId, result: JSON.stringify(pollData.data?.task_result).slice(0, 500) });
+          throw new Error('Kling: no video URL in result');
+        }
 
-        logger.info('Kling: clip generated', { taskId, duration });
+        logger.info('Kling: clip generated successfully', { taskId, duration, videoUrl: videoUrl.slice(0, 80) });
 
         return {
           videoUrl,
@@ -105,12 +130,14 @@ export class KlingProvider implements CinematicProvider {
       }
 
       if (status === 'failed') {
-        throw new Error(`Kling generation failed: ${pollData.data?.task_status_msg || 'unknown'}`);
+        const msg = pollData.data?.task_status_msg || 'unknown';
+        logger.error('Kling: generation failed', { taskId, message: msg });
+        throw new Error(`Kling generation failed: ${msg}`);
       }
 
       // Log progress every 30s
       if (i > 0 && i % 6 === 0) {
-        logger.info('Kling: polling', { taskId, status, attempt: i });
+        logger.info('Kling: polling', { taskId, status, attempt: i, elapsed: `${i * 5}s` });
       }
     }
 

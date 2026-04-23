@@ -167,6 +167,50 @@ function buildOpenApiSpec(): Record<string, unknown> {
     },
   };
 
+  // Add /api/v1/tts-providers
+  paths['/api/v1/tts-providers'] = {
+    get: {
+      operationId: 'list_tts_providers',
+      summary: 'List available TTS providers',
+      description: 'Returns which TTS providers are available for generating audio (podcast, video narration). Availability depends on configured API keys (BYOK or environment).',
+      tags: ['Discovery'],
+      security: [{ BearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'List of TTS providers with availability',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  providers: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        key: { type: 'string', enum: ['openai', 'mistral', 'elevenlabs', 'gemini'] },
+                        name: { type: 'string' },
+                        available: { type: 'boolean', description: 'Whether an API key is configured for this provider' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': {
+          description: 'Missing or invalid API key',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ErrorResponse' },
+            },
+          },
+        },
+      },
+    },
+  };
+
   return {
     openapi: '3.1.0',
     info: {

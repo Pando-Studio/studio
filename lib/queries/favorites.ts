@@ -30,6 +30,7 @@ export interface UserFavorite {
 
 async function fetchFavorites(): Promise<UserFavorite[]> {
   const res = await fetch('/api/favorites');
+  if (res.status === 401) return []; // Anonymous viewers have no favorites
   if (!res.ok) throw new Error('Failed to fetch favorites');
   const data = await res.json();
   return data.favorites;

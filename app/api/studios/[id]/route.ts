@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getStudioAuthContext } from '@/lib/api/auth-context';
+import { getStudioAuthContext, requireStudioAccess } from '@/lib/api/auth-context';
 import { logger } from '@/lib/monitoring/logger';
 import { validateBody, updateStudioSchema } from '@/lib/api/schemas';
 
@@ -10,7 +10,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const ctx = await getStudioAuthContext(id);
+    const ctx = await requireStudioAccess(id);
     if ('error' in ctx) {
       return NextResponse.json({ error: ctx.error }, { status: ctx.status });
     }
@@ -49,7 +49,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
       },
     });
 
-    return NextResponse.json({ studio });
+    return NextResponse.json({ studio, role: ctx.effectiveRole });
   } catch (error: unknown) {
     logger.error('Error fetching studio', { error: error instanceof Error ? error : String(error) });
     return NextResponse.json({ error: 'Failed to fetch studio' }, { status: 500 });

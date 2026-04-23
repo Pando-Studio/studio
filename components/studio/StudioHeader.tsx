@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { ShareDialog } from './ShareDialog';
 
 export function StudioHeader() {
-  const { studio, runs, updateStudioTitle } = useStudio();
+  const { studio, runs, updateStudioTitle, canEdit, isViewer } = useStudio();
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -80,7 +80,7 @@ export function StudioHeader() {
           </Button>
         </Link>
 
-        {isEditing ? (
+        {isEditing && canEdit ? (
           <div className="flex items-center gap-2">
             <Input
               ref={inputRef}
@@ -114,13 +114,17 @@ export function StudioHeader() {
             </Button>
           </div>
         ) : (
-          <button
-            onClick={handleStartEdit}
-            className="flex items-center gap-2 group"
-          >
+          {canEdit ? (
+            <button
+              onClick={handleStartEdit}
+              className="flex items-center gap-2 group"
+            >
+              <h1 className="text-lg font-semibold">{studio?.title || 'Studio'}</h1>
+              <Pencil className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          ) : (
             <h1 className="text-lg font-semibold">{studio?.title || 'Studio'}</h1>
-            <Pencil className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
+          )}
         )}
       </div>
 
@@ -150,12 +154,14 @@ export function StudioHeader() {
           </Button>
         </a>
 
-        {/* Settings button */}
-        <Link href={`/settings/providers?studio=${studio?.id}`}>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </Link>
+        {/* Settings button (owner/editor only) */}
+        {canEdit && (
+          <Link href={`/settings/providers?studio=${studio?.id}`}>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </Link>
+        )}
       </div>
 
     </div>

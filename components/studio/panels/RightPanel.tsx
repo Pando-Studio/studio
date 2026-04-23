@@ -724,7 +724,7 @@ function LibrarySection({
 }
 
 export function RightPanel() {
-  const { studio, runs, selectedSourceIds, refreshStudio, rootWidgets } = useStudio();
+  const { studio, runs, selectedSourceIds, refreshStudio, rootWidgets, canEdit, isViewer } = useStudio();
   const { isRightPanelCollapsed, toggleRightPanel } = usePanels();
   const router = useRouter();
 
@@ -943,28 +943,30 @@ export function RightPanel() {
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
-        {/* Generables Section */}
-        <div className="border-b border-gray-200">
-          <button
-            className="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors"
-            onClick={() => toggleSection('generables')}
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-yellow-600" />
-              <span className="text-base font-medium">Generables</span>
-            </div>
-            {expandedSections.has('generables') ? (
-              <ChevronUp className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        {/* Generables Section (hidden for viewers) */}
+        {canEdit && (
+          <div className="border-b border-gray-200">
+            <button
+              className="w-full flex items-center justify-between p-3 hover:bg-gray-50 transition-colors"
+              onClick={() => toggleSection('generables')}
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-yellow-600" />
+                <span className="text-base font-medium">Generables</span>
+              </div>
+              {expandedSections.has('generables') ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              )}
+            </button>
+            {expandedSections.has('generables') && (
+              <div className="px-3 pb-3 max-h-[50vh] overflow-y-auto">
+                <GenerablesSection onQuickGenerate={handleQuickGenerate} onOpenGenerationModal={handleOpenGenerationModal} />
+              </div>
             )}
-          </button>
-          {expandedSections.has('generables') && (
-            <div className="px-3 pb-3 max-h-[50vh] overflow-y-auto">
-              <GenerablesSection onQuickGenerate={handleQuickGenerate} onOpenGenerationModal={handleOpenGenerationModal} />
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Library Section */}
         <div className="border-b border-gray-200">
@@ -988,7 +990,6 @@ export function RightPanel() {
                 studioId={studio?.id ?? ''}
                 onOpenCoursePlan={handleOpenCoursePlan}
                 onOpenWidget={(id) => {
-                  // Navigate to dedicated page for composites
                   const widget = rootWidgets.find((w) => w.id === id);
                   if (widget && widget.kind === 'COMPOSED') {
                     router.push(`/studios/${studio?.id}/composites/${id}`);
@@ -996,9 +997,9 @@ export function RightPanel() {
                     setEditingWidgetId(id);
                   }
                 }}
-                onCreateComposite={handleCreateComposite}
-                onCreateCompositeFromLibrary={() => setShowCompositeFromLibrary(true)}
-                onConvertToSource={handleConvertToSource}
+                onCreateComposite={canEdit ? handleCreateComposite : undefined}
+                onCreateCompositeFromLibrary={canEdit ? () => setShowCompositeFromLibrary(true) : undefined}
+                onConvertToSource={canEdit ? handleConvertToSource : undefined}
               />
             </div>
           )}
@@ -1035,8 +1036,9 @@ export function RightPanel() {
           onClose={() => setEditingWidgetId(null)}
           widgetId={editingWidgetId}
           studioId={studio.id}
-          onUpdated={refreshStudio}
-          onDeleted={refreshStudio}
+          onUpdated={canEdit ? refreshStudio : undefined}
+          onDeleted={canEdit ? refreshStudio : undefined}
+          readOnly={isViewer}
         />
       )}
 

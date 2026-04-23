@@ -48,6 +48,7 @@ export interface Studio {
     presentations: number;
     conversations: number;
   };
+  role?: 'owner' | 'editor' | 'viewer';
 }
 
 // ----- Fetchers ------------------------------------------------------------
@@ -63,7 +64,7 @@ async function fetchStudio(id: string): Promise<Studio> {
   const res = await fetch(`/api/studios/${id}`);
   if (!res.ok) throw new Error('Failed to fetch studio');
   const data = await res.json();
-  return data.studio;
+  return { ...data.studio, role: data.role };
 }
 
 // ----- Query hooks ---------------------------------------------------------

@@ -48,6 +48,11 @@ interface StudioContextValue {
   isLoading: boolean;
   error: string | null;
 
+  // Role-based access
+  role: 'owner' | 'editor' | 'viewer';
+  canEdit: boolean;
+  isViewer: boolean;
+
   // Sources
   sources: StudioSource[];
   selectedSourceIds: Set<string>;
@@ -219,10 +224,18 @@ export function StudioProvider({ studioId, children }: StudioProviderProps) {
     [updateStudioMut],
   );
 
+  const role = studio?.role ?? 'viewer';
+  const canEdit = role === 'owner' || role === 'editor';
+  const isViewer = role === 'viewer';
+
   const value: StudioContextValue = {
     studio,
     isLoading: studioQuery.isLoading,
     error: studioQuery.error?.message ?? null,
+
+    role,
+    canEdit,
+    isViewer,
 
     sources: studio?.sources ?? [],
     selectedSourceIds: uiStore.selectedSourceIds,

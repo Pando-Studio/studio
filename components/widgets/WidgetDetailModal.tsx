@@ -24,6 +24,7 @@ interface WidgetDetailModalProps {
   onDeleted?: () => void;
   onGenerateFrom?: (type: GenerationType, parentWidget: WidgetData) => void;
   onNavigateToWidget?: (widgetId: string) => void;
+  readOnly?: boolean;
 }
 
 type TabMode = 'display' | 'edit' | 'structure' | 'play';
@@ -37,6 +38,7 @@ export function WidgetDetailModal({
   onDeleted,
   onGenerateFrom,
   onNavigateToWidget,
+  readOnly = false,
 }: WidgetDetailModalProps) {
   const [widget, setWidget] = useState<WidgetData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -285,19 +287,21 @@ export function WidgetDetailModal({
                   <Eye className="h-3.5 w-3.5 inline mr-1" />
                   Apercu
                 </button>
-                <button
-                  className={cn(
-                    'px-3 py-1 text-xs rounded-md transition-colors',
-                    mode === 'edit'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                  onClick={() => setMode('edit')}
-                >
-                  <Pencil className="h-3.5 w-3.5 inline mr-1" />
-                  Editer
-                </button>
-                {isComposite && (
+                {!readOnly && (
+                  <button
+                    className={cn(
+                      'px-3 py-1 text-xs rounded-md transition-colors',
+                      mode === 'edit'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                    )}
+                    onClick={() => setMode('edit')}
+                  >
+                    <Pencil className="h-3.5 w-3.5 inline mr-1" />
+                    Editer
+                  </button>
+                )}
+                {isComposite && !readOnly && (
                   <button
                     className={cn(
                       'px-3 py-1 text-xs rounded-md transition-colors',
@@ -327,7 +331,7 @@ export function WidgetDetailModal({
                 )}
               </div>
               {/* Open full editor (composite only) */}
-              {isComposite && (
+              {isComposite && !readOnly && (
                 <Link href={`/studios/${studioId}/composites/${widgetId}`}>
                   <Button variant="outline" size="sm">
                     <Maximize2 className="h-3.5 w-3.5 mr-1.5" />
@@ -336,25 +340,27 @@ export function WidgetDetailModal({
                 </Link>
               )}
               {/* Delete */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-destructive hover:text-destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-              </Button>
+              {!readOnly && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         </DialogHeader>
 
-        {/* Draft confirmation bar */}
-        {widget?.status === 'DRAFT' && (
+        {/* Draft confirmation bar (hidden for viewers) */}
+        {widget?.status === 'DRAFT' && !readOnly && (
           <div className="flex items-center justify-between px-4 py-2 bg-amber-50 border-b border-amber-200 rounded-t-lg">
             <div className="flex items-center gap-2 text-sm text-amber-800">
               <Eye className="h-4 w-4" />

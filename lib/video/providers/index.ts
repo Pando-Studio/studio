@@ -4,34 +4,32 @@ import { RunwayProvider } from './runway';
 
 export type { CinematicProvider, CinematicClip, CinematicSection } from './types';
 
-const PROVIDER_ENV_KEYS: Record<string, string> = {
-  kling: 'KLING_API_KEY',
-  runway: 'RUNWAY_API_KEY',
-  sora: 'OPENAI_API_KEY',
-  veo: 'GOOGLE_API_KEY',
-};
-
 export function getCinematicProvider(providerName: string): CinematicProvider {
-  const envKey = PROVIDER_ENV_KEYS[providerName];
-  const apiKey = envKey ? process.env[envKey] : undefined;
-
-  if (!apiKey) {
-    throw new Error(
-      `No API key found for cinematic provider "${providerName}". ` +
-      `Set ${envKey || 'the corresponding API key'} in your environment.`
-    );
-  }
-
   switch (providerName) {
-    case 'kling':
-      return new KlingProvider(apiKey);
-    case 'runway':
+    case 'kling': {
+      const accessKey = process.env.KLING_ACCESS_KEY;
+      const secretKey = process.env.KLING_SECRET_KEY;
+      if (!accessKey || !secretKey) {
+        throw new Error(
+          'Kling API requires KLING_ACCESS_KEY and KLING_SECRET_KEY in environment. ' +
+          'Get keys at https://klingai.com/global/dev/'
+        );
+      }
+      return new KlingProvider(accessKey, secretKey);
+    }
+    case 'runway': {
+      const apiKey = process.env.RUNWAY_API_KEY;
+      if (!apiKey) {
+        throw new Error(
+          'Runway API requires RUNWAY_API_KEY in environment. ' +
+          'Get key at https://dev.runwayml.com'
+        );
+      }
       return new RunwayProvider(apiKey);
+    }
     case 'sora':
-      // TODO: implement Sora provider
       throw new Error('Sora provider not yet implemented');
     case 'veo':
-      // TODO: implement Veo provider
       throw new Error('Veo provider not yet implemented');
     default:
       throw new Error(`Unknown cinematic provider: ${providerName}`);

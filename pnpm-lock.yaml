@@ -179,6 +179,9 @@ importers:
       ioredis:
         specifier: ^5.9.2
         version: 5.10.1
+      jose:
+        specifier: ^6.2.2
+        version: 6.2.2
       lucide-react:
         specifier: ^0.511.0
         version: 0.511.0(react@18.3.1)

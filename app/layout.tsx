@@ -15,12 +15,25 @@ const gtWalsheim = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Qiplim Studio — Create interactive experiences',
+  title: 'Qiplim Studio — Any document to any learning content',
   description:
-    'Create interactive experiences from any document. Generate quizzes, presentations, adventures and more — powered by AI.',
+    'Open source AI platform that transforms documents into interactive learning content: quizzes, summaries, flashcards, podcasts, videos, presentations, and more. Self-hostable, multi-provider (Mistral, OpenAI, Anthropic, Google).',
   icons: {
     icon: '/favicon.webp',
     apple: '/favicon.webp',
+  },
+  openGraph: {
+    title: 'Qiplim Studio — Any document to any learning content',
+    description:
+      'Open source AI platform that transforms documents into interactive learning content: quizzes, summaries, flashcards, podcasts, videos, presentations, and more.',
+    siteName: 'Qiplim Studio',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Qiplim Studio — Any document to any learning content',
+    description:
+      'Open source AI platform that transforms documents into interactive learning content. Self-hostable, multi-provider.',
   },
 };
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma, Prisma } from '@/lib/db';
-import { getStudioAuthContext } from '@/lib/api/auth-context';
+import { getStudioAuthContext, getPublicStudioAccess } from '@/lib/api/auth-context';
 import { logger } from '@/lib/monitoring/logger';
 import { getFullSourceContent, hybridSearch } from '@/lib/ai/embeddings';
 import { getProviderForStudio, PROVIDER_INFO } from '@/lib/ai/providers';
@@ -26,12 +26,12 @@ export async function POST(request: Request, { params }: RouteParams) {
   try {
     const { id: studioId } = await params;
 
-    const ctx = await getStudioAuthContext(studioId);
+    const ctx = await getPublicStudioAccess(studioId);
     if ('error' in ctx) {
       return NextResponse.json({ error: ctx.error }, { status: ctx.status });
     }
 
-    // Rate limiting: 50 requests/hour
+    // Rate limiting: 50 requests/hour (use IP for anonymous)
     const rateLimitKey = `chat:user:${ctx.userId}`;
     const rateCheck = await checkRateLimit(rateLimitKey, 50, 3600);
     if (!rateCheck.allowed) {
@@ -390,11 +390,13 @@ ${getToolsSummary()}
     ];
 
     // Unified streaming with tools — LLM decides when to call tools
+    // Viewers get no tools (read-only chat, no generation)
+    const isViewer = ctx.effectiveRole === 'viewer';
     const result = streamText({
       model,
       system: systemPrompt,
       messages: aiMessages,
-      tools: widgetGenerationTools,
+      ...(isViewer ? {} : { tools: widgetGenerationTools }),
       stopWhen: stepCountIs(3),
     });
 

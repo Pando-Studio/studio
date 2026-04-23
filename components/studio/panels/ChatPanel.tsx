@@ -619,22 +619,6 @@ export function ChatPanel() {
     return [];
   };
 
-  // Chat requires authentication — show message for anonymous public viewers
-  if (isViewer) {
-    return (
-      <div className="flex flex-col h-full items-center justify-center text-center px-6">
-        <MessageSquare className="h-10 w-10 text-muted-foreground/30 mb-3" />
-        <p className="text-sm font-medium text-muted-foreground">Mode lecture</p>
-        <p className="text-xs text-muted-foreground/70 mt-1">
-          Connectez-vous pour discuter avec les sources de ce studio.
-        </p>
-        <a href="/login" className="text-xs text-primary hover:underline mt-3">
-          Se connecter
-        </a>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-full">
       {/* Conversation header */}
@@ -822,8 +806,8 @@ export function ChatPanel() {
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                     )}
 
-                    {/* Tool approval cards (new needsApproval flow) */}
-                    {approvals.map((approval, i) => {
+                    {/* Tool approval cards — hidden for viewers */}
+                    {!isViewer && approvals.map((approval, i) => {
                       // Special case: generation plan tool
                       if (approval.toolName === 'propose_generation_plan' && approval.args) {
                         const planArgs = approval.args as {

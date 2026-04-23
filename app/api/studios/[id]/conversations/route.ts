@@ -38,7 +38,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 export async function POST(request: Request, { params }: RouteParams) {
   try {
     const { id: studioId } = await params;
-    const ctx = await getStudioAuthContext(studioId);
+    const ctx = await getPublicStudioAccess(studioId);
     if ('error' in ctx) {
       return NextResponse.json({ error: ctx.error }, { status: ctx.status });
     }

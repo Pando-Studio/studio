@@ -5,7 +5,8 @@
     "developers": "Developpeurs",
     "openSource": "Open Source",
     "github": "GitHub",
-    "getStarted": "Commencer"
+    "getStarted": "Commencer",
+    "roadmap": "Roadmap"
   },
   "hero": {
     "badge": "Alternative open source a NotebookLM",
@@ -98,6 +99,7 @@
     "aiAct": "Conformite IA Act",
     "onPremise": "On-Premise",
     "api": "API",
+    "roadmap": "Roadmap",
     "madeBy": "Fait par"
   },
   "education": {
@@ -568,5 +570,62 @@
     "ctaText": "Qiplim Studio est open source sous licence MIT. Clonez le depot et deployez sur votre materiel des aujourd'hui.",
     "ctaButton": "Voir sur GitHub",
     "ctaDocs": "Lire la documentation"
+  },
+  "roadmap": {
+    "badge": "Roadmap",
+    "title": "Notre feuille de route",
+    "subtitle": "Notre roadmap de developpement — du MVP a l'ecosysteme complet. Suivez ce qui est livre, en cours, et a venir.",
+    "statusDone": "Termine",
+    "statusInProgress": "En cours",
+    "statusPlanned": "Planifie",
+    "ctaTitle": "Envie de contribuer ?",
+    "ctaSubtitle": "Qiplim Studio est open source. Consultez le repo, ouvrez une issue ou soumettez une PR.",
+    "ctaButton": "Voir sur GitHub",
+    "phases": {
+      "mvp": {
+        "title": "MVP Studio",
+        "description": "Interface tri-panneaux, 28 types de widgets, chat IA avec sources, pipeline RAG, generation en temps reel."
+      },
+      "chatAi": {
+        "title": "Chat IA & Sources",
+        "description": "Multi-conversations, modes Ask/Plan/Agent, BYOK multi-provider (Mistral, OpenAI, Anthropic, Google), recherche hybride RAG."
+      },
+      "openSource": {
+        "title": "Open Source",
+        "description": "Depot GitHub public, licence Apache 2.0, guides de contribution, mise en place de la communaute."
+      },
+      "presentations": {
+        "title": "Presentations",
+        "description": "Editeur de presentations integre avec slides, notes speaker et widgets embarques. Plugins Google Slides et PowerPoint a venir."
+      },
+      "templates": {
+        "title": "Systeme de templates",
+        "description": "Templates de generation JSON, registre de templates, constructeur de prompts. Widget Dev Kit et creation de templates externes planifies."
+      },
+      "interop": {
+        "title": "Interoperabilite",
+        "description": "API REST v1, serveur MCP (stdio + HTTP). A venir : export xAPI, LTI 1.3, packages SCORM, webhooks."
+      },
+      "cliApiMcp": {
+        "title": "CLI / API / MCP",
+        "description": "Surface developpeur unifiee : outils MCP etendus (creer un studio, importer des sources, gerer les widgets), API REST enrichie, CLI (npx qiplim-studio generate)."
+      },
+      "workflows": {
+        "title": "Workflows & Automation",
+        "description": "Editeur visuel de composition, webhooks sur les evenements studio, compatibilite n8n/Make/Zapier, pipelines de contenu automatises."
+      },
+      "notebook": {
+        "title": "Widget Notebook",
+        "description": "Widget interactif style Jupyter avec cellules markdown, cellules de code executables et runtime sandboxe. Genere par IA a partir des documents sources."
+      },
+      "roles": {
+        "title": "Roles granulaires",
+        "description": "Controle d'acces base sur les permissions, roles personnalises par studio, permissions fines (sources, generation, membres, analytique, parametres)."
+      },
+      "marketplace": {
+        "title": "Marketplace de widgets",
+        "description": "Niveaux Community / Verified / Official, publication et decouverte de templates, CLI Widget Dev Kit (init, test, publish)."
+      }
+    }
   }
 }

@@ -187,6 +187,7 @@ export default function HomePage() {
     { label: t('nav.useCases'), href: '#use-cases' },
     { label: t('nav.developers'), href: '/developers' },
     { label: t('nav.openSource'), href: '#open-source' },
+    { label: t('nav.roadmap'), href: '/roadmap' },
     {
       label: t('nav.github'),
       href: 'https://github.com/Qiplim/studio',
@@ -774,6 +775,12 @@ export default function HomePage() {
                 className="hover:text-landing-text transition-colors"
               >
                 {t('footer.onPremise')}
+              </Link>
+              <Link
+                href="/roadmap"
+                className="hover:text-landing-text transition-colors"
+              >
+                {t('footer.roadmap')}
               </Link>
               <a
                 href="https://qiplim.com"

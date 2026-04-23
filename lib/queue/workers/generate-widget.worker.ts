@@ -269,13 +269,77 @@ async function processJob(
       where: { id: runId },
       data: { errorLog: `assembly_check: ${JSON.stringify(assemblyCheck)}` },
     });
+    const videoMode = (inputs as Record<string, unknown>).mode as string || 'slideshow';
     if (isVideoGeneration && generatedData.script) {
       const slides = (generatedData.script as { slides: Array<Record<string, unknown>> }).slides;
       const hasAudio = slides.some((s) => s.audioUrl);
-      logger.info('Video assembly audio check', { runId, hasAudio, slidesWithAudio: slides.filter(s => s.audioUrl).length });
-      if (hasAudio) {
+      logger.info('Video assembly check', { runId, hasAudio, videoMode, slidesWithAudio: slides.filter(s => s.audioUrl).length });
+
+      if (videoMode === 'cinematic') {
+        // CINEMATIC MODE: generate AI video clips + assemble with ffmpeg
         try {
-          logger.generation('Assembling video with Remotion', { runId, slideCount: slides.length });
+          const cinematicProviderName = (inputs as Record<string, unknown>).cinematicProvider as string || 'kling';
+          logger.generation('Cinematic video generation', { runId, provider: cinematicProviderName, sections: slides.length });
+          await updateRunProgress(runId, studioId, {
+            step: 'cinematic',
+            label: `Generation cinematique (0/${slides.length})...`,
+            progress: 78,
+          });
+
+          const { getCinematicProvider } = await import('../../video/providers');
+          const { renderCinematicVideo } = await import('../../video/cinematic-render');
+          const { uploadToS3, generateS3Key } = await import('../../s3');
+
+          const provider = getCinematicProvider(cinematicProviderName);
+
+          // Convert slides to cinematic sections
+          const sections = slides.map((s) => ({
+            id: s.id as string,
+            title: (s.title as string) || '',
+            visualPrompt: (s.imagePrompt as string) || (s.narration as string) || (s.title as string) || '',
+            narration: (s.narration as string) || '',
+            durationHint: (s.durationHint as number) || 8,
+            audioUrl: s.audioUrl as string | undefined,
+          }));
+
+          const renderResult = await renderCinematicVideo(
+            sections,
+            provider,
+            (current, total) => {
+              updateRunProgress(runId, studioId, {
+                step: 'cinematic',
+                label: `Generation cinematique (${current}/${total})...`,
+                progress: 78 + Math.round((current / total) * 15),
+              });
+            },
+          );
+
+          // Upload video
+          const videoKey = generateS3Key(`cinematic-${Date.now()}.mp4`, studioId);
+          const videoUpload = await uploadToS3(renderResult.videoBuffer, videoKey, 'video/mp4');
+          generatedData.videoUrl = videoUpload.url;
+          generatedData.duration = Math.round(renderResult.durationSeconds);
+
+          logger.generation('Cinematic video assembled', {
+            runId,
+            duration: renderResult.durationSeconds,
+            videoSize: renderResult.videoBuffer.length,
+            provider: cinematicProviderName,
+          });
+        } catch (renderError) {
+          await prisma.generationRun.update({
+            where: { id: runId },
+            data: { errorLog: `Cinematic assembly failed: ${renderError instanceof Error ? renderError.message : String(renderError)}` },
+          });
+          logger.warn('Cinematic video assembly failed', {
+            runId,
+            error: renderError instanceof Error ? renderError.message : String(renderError),
+          });
+        }
+      } else if (hasAudio) {
+        // SLIDESHOW MODE: render slides + audio into MP4 with Remotion
+        try {
+          logger.generation('Assembling slideshow video with Remotion', { runId, slideCount: slides.length });
           await updateRunProgress(runId, studioId, {
             step: 'assembling',
             label: 'Assemblage de la video...',
@@ -302,14 +366,12 @@ async function processJob(
           // Update duration with exact render duration
           generatedData.duration = Math.round(renderResult.durationSeconds);
 
-          logger.generation('Video assembled', {
+          logger.generation('Slideshow video assembled', {
             runId,
             duration: renderResult.durationSeconds,
             videoSize: renderResult.videoBuffer.length,
           });
         } catch (renderError) {
-          // Render failure is non-fatal: storyboard + audio still saved
-          // Persist error in generation run metadata for debugging
           await prisma.generationRun.update({
             where: { id: runId },
             data: { errorLog: `Video assembly failed: ${renderError instanceof Error ? renderError.message : String(renderError)}` },

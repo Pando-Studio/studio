@@ -110,7 +110,7 @@ function HighlightedSnippet({ snippet, query }: { snippet: string; query: string
 }
 
 export function SourcesPanel() {
-  const { studio, refreshStudio } = useStudio();
+  const { studio, refreshStudio, canEdit, isViewer } = useStudio();
   const {
     sources,
     selectedSourceIds,
@@ -374,9 +374,9 @@ export function SourcesPanel() {
   return (
     <div
       className="h-full flex flex-col relative"
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
+      onDragOver={canEdit ? handleDragOver : undefined}
+      onDragLeave={canEdit ? handleDragLeave : undefined}
+      onDrop={canEdit ? handleDrop : undefined}
     >
       {/* Drag overlay */}
       {isDragging && (
@@ -485,22 +485,24 @@ export function SourcesPanel() {
             )}
             <span>{allSelected ? 'Tout deselectionner' : 'Tout selectionner'}</span>
           </button>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2"
-              title="Importer depuis Google Drive"
-              onClick={() => setIsDrivePickerOpen(true)}
-            >
-              <CloudDownload className="h-3.5 w-3.5 mr-1" />
-              Drive
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => setIsAddModalOpen(true)}>
-              <Plus className="h-3.5 w-3.5 mr-1" />
-              Ajouter
-            </Button>
-          </div>
+          {canEdit && (
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2"
+                title="Importer depuis Google Drive"
+                onClick={() => setIsDrivePickerOpen(true)}
+              >
+                <CloudDownload className="h-3.5 w-3.5 mr-1" />
+                Drive
+              </Button>
+              <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => setIsAddModalOpen(true)}>
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                Ajouter
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

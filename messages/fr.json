@@ -176,16 +176,6 @@
       "accessible": "Accessible",
       "accessibleDesc": "Concu pour tous les apprenants. Compatible lecteurs d'ecran. Navigation clavier."
     },
-    "institutions": {
-      "title": "Concu pour les institutions",
-      "subtitle": "Adopte par des etablissements et des collectivites.",
-      "paysLoire": "Region Pays de la Loire",
-      "paysLoireDesc": "Reseau de lycees",
-      "ecoleDesign": "L'Ecole de Design Nantes Atlantique",
-      "ecoleDesignDesc": "Enseignement superieur",
-      "placeholder": "Votre institution",
-      "placeholderDesc": "Contactez-nous"
-    },
     "cta": {
       "title": "Transformez votre enseignement",
       "subtitle": "De vos documents a des sessions interactives en quelques minutes.",

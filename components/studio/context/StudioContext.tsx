@@ -111,16 +111,15 @@ export function StudioProvider({ studioId, children }: StudioProviderProps) {
   const studioQuery = useStudioQuery(studioId);
   const runsQuery = useStudioRuns(studioId);
 
+  const studio = studioQuery.data ?? null;
+
   // SSE: receive real-time events from workers via Redis pub/sub
   // Disabled for viewers (SSE endpoint requires auth, causes retry loop for anonymous users)
-  const studioRole = studio?.role;
-  useStudioEvents({ studioId, onEvent: () => {}, enabled: studioRole !== 'viewer' });
+  useStudioEvents({ studioId, onEvent: () => {}, enabled: studio?.role !== 'viewer' });
   const coursePlansQuery = useStudioCoursePlans(studioId);
   const favoritesQuery = useFavorites();
   const updateStudioMut = useUpdateStudioMutation(studioId);
   const toggleFavoriteMut = useToggleFavorite();
-
-  const studio = studioQuery.data ?? null;
   const runs = runsQuery.data ?? [];
   const coursePlans = coursePlansQuery.data ?? [];
   const favorites = favoritesQuery.data ?? [];

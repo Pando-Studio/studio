@@ -112,7 +112,9 @@ export function StudioProvider({ studioId, children }: StudioProviderProps) {
   const runsQuery = useStudioRuns(studioId);
 
   // SSE: receive real-time events from workers via Redis pub/sub
-  useStudioEvents({ studioId, onEvent: () => {} });
+  // Disabled for viewers (SSE endpoint requires auth, causes retry loop for anonymous users)
+  const studioRole = studio?.role;
+  useStudioEvents({ studioId, onEvent: () => {}, enabled: studioRole !== 'viewer' });
   const coursePlansQuery = useStudioCoursePlans(studioId);
   const favoritesQuery = useFavorites();
   const updateStudioMut = useUpdateStudioMutation(studioId);

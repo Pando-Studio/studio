@@ -689,6 +689,12 @@ Content-Type: application/json`}
               >
                 llms.txt
               </a>
+              <Link
+                href="/roadmap"
+                className="hover:text-landing-text transition-colors"
+              >
+                Roadmap
+              </Link>
               <a
                 href="https://qiplim.com"
                 target="_blank"

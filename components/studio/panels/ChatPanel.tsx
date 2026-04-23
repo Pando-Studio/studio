@@ -263,7 +263,7 @@ function SourceAttribution({ citations }: SourceAttributionProps) {
 // ---------------------------------------------------------------------------
 
 export function ChatPanel() {
-  const { studio, widgets, conversations: studioConversations } = useStudio();
+  const { studio, widgets, conversations: studioConversations, isViewer } = useStudio();
   const { sources, selectedSourceIds } = useSources();
   const { activeConversationId, setActiveConversationId } = useConversations();
 
@@ -618,6 +618,18 @@ export function ChatPanel() {
     }
     return [];
   };
+
+  if (isViewer) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center text-center px-6">
+        <MessageSquare className="h-10 w-10 text-muted-foreground/30 mb-3" />
+        <p className="text-sm font-medium text-muted-foreground">Mode lecture</p>
+        <p className="text-xs text-muted-foreground/70 mt-1">
+          Le chat est disponible pour les membres du studio. Explorez les widgets dans le panneau de droite.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

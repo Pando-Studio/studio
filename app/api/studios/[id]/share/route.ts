@@ -125,3 +125,29 @@ export async function POST(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Failed to create share' }, { status: 500 });
   }
 }
+
+// DELETE /api/studios/[id]/share?shareId=xxx — Remove a share
+export async function DELETE(request: Request, { params }: RouteParams) {
+  try {
+    const { id: studioId } = await params;
+    const ctx = await getStudioAuthContext(studioId);
+    if ('error' in ctx) {
+      return NextResponse.json({ error: ctx.error }, { status: ctx.status });
+    }
+
+    const url = new URL(request.url);
+    const shareId = url.searchParams.get('shareId');
+    if (!shareId) {
+      return NextResponse.json({ error: 'Missing shareId parameter' }, { status: 400 });
+    }
+
+    await prisma.studioShare.delete({
+      where: { id: shareId, studioId },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    logger.error('Error deleting share', { error: error instanceof Error ? error : String(error) });
+    return NextResponse.json({ error: 'Failed to delete share' }, { status: 500 });
+  }
+}

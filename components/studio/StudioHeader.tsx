@@ -15,6 +15,8 @@ import {
   Radio,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ShareDialog } from './ShareDialog';
+
 export function StudioHeader() {
   const { studio, runs, updateStudioTitle } = useStudio();
   const [isEditing, setIsEditing] = useState(false);
@@ -133,6 +135,9 @@ export function StudioHeader() {
             </span>
           </div>
         )}
+
+        {/* Share button */}
+        {studio?.id && <ShareDialog studioId={studio.id} />}
 
         {/* Live Qiplim button */}
         <a href="https://qiplim.com" target="_blank" rel="noopener noreferrer">

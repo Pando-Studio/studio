@@ -619,14 +619,18 @@ export function ChatPanel() {
     return [];
   };
 
+  // Chat requires authentication — show message for anonymous public viewers
   if (isViewer) {
     return (
       <div className="flex flex-col h-full items-center justify-center text-center px-6">
         <MessageSquare className="h-10 w-10 text-muted-foreground/30 mb-3" />
         <p className="text-sm font-medium text-muted-foreground">Mode lecture</p>
         <p className="text-xs text-muted-foreground/70 mt-1">
-          Le chat est disponible pour les membres du studio. Explorez les widgets dans le panneau de droite.
+          Connectez-vous pour discuter avec les sources de ce studio.
         </p>
+        <a href="/login" className="text-xs text-primary hover:underline mt-3">
+          Se connecter
+        </a>
       </div>
     );
   }

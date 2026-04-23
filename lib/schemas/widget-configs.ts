@@ -450,7 +450,7 @@ export const VideoConfigSchema = z.object({
     slides: z.array(VideoSlideSchema),
   }).optional(),
   generationConfig: z.object({
-    mode: z.enum(['slideshow', 'avatar']).default('slideshow'),
+    mode: z.enum(['slideshow', 'cinematic']).default('slideshow'),
     slideCount: z.number().min(3).max(30).default(8),
     targetDuration: z.enum(['1', '3', '5', '10']).default('3'),
     tone: z.enum(['casual', 'professional', 'academic']).default('professional'),
@@ -458,6 +458,7 @@ export const VideoConfigSchema = z.object({
     includeSubtitles: z.boolean().default(true),
     includeSlideImages: z.boolean().default(false),
     imageProvider: z.enum(['gemini', 'dall-e-3']).default('gemini'),
+    cinematicProvider: z.enum(['kling', 'runway', 'sora', 'veo']).default('kling'),
   }).optional(),
 });
 

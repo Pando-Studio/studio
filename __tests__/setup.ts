@@ -82,13 +82,18 @@ vi.mock('@/lib/db', () => {
       update: vi.fn(),
     },
     userProviderConfig: {
+      findUnique: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
+      upsert: vi.fn(),
     },
     providerConfig: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
       findMany: vi.fn(),
+      upsert: vi.fn(),
+      updateMany: vi.fn(),
+      deleteMany: vi.fn(),
     },
     studioSource: {
       findMany: vi.fn(),

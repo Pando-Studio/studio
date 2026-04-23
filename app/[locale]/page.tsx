@@ -791,6 +791,12 @@ export default function HomePage() {
               >
                 {t('footer.api')}
               </Link>
+              <Link
+                href="/ai-act"
+                className="hover:text-landing-text transition-colors"
+              >
+                {t('footer.aiAct')}
+              </Link>
               <a
                 href="https://qiplim.com"
                 target="_blank"

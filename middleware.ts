@@ -7,7 +7,7 @@ const protectedRoutes = ['/dashboard', '/studios', '/settings'];
 const authRoutes = ['/login', '/register'];
 // Routes publiques (accessibles sans rien)
 // Note: /docs and /developers are now under [locale]/ and handled by next-intl routing
-const publicRoutes = ['/', '/recover', '/docs', '/developers'];
+const publicRoutes = ['/', '/recover', '/docs', '/developers', '/ai-act'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

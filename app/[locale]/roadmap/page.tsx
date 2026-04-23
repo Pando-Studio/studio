@@ -261,15 +261,12 @@ export default function RoadmapPage() {
                                 : 'border-landing-border'
                           }`}
                         >
-                          <div className="flex items-start justify-between mb-3">
+                          <div className="mb-3">
                             <div
                               className={`w-10 h-10 rounded-lg flex items-center justify-center ${config.bg}`}
                             >
                               <Icon className={`w-5 h-5 ${config.text}`} />
                             </div>
-                            <span className="text-xs font-display font-medium text-muted-foreground">
-                              {phase.quarter}
-                            </span>
                           </div>
                           <h3 className="font-display font-bold text-lg text-landing-text mb-2">
                             {tRoadmap(`phases.${phase.id}.title`)}

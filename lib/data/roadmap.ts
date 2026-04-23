@@ -18,42 +18,21 @@ export type RoadmapStatus = 'done' | 'in-progress' | 'planned';
 export interface RoadmapPhase {
   id: string;
   status: RoadmapStatus;
-  quarter: string;
   icon: LucideIcon;
 }
 
 export const roadmapPhases: RoadmapPhase[] = [
-  { id: 'mvp', status: 'done', quarter: 'Q1 2026', icon: Rocket },
-  { id: 'chatAi', status: 'done', quarter: 'Q2 2026', icon: MessageCircle },
-  { id: 'openSource', status: 'done', quarter: 'Q3 2026', icon: Github },
-  {
-    id: 'presentations',
-    status: 'in-progress',
-    quarter: 'Q1-Q2 2026',
-    icon: Presentation,
-  },
-  {
-    id: 'templates',
-    status: 'in-progress',
-    quarter: 'Q2-Q3 2026',
-    icon: Layers,
-  },
-  {
-    id: 'interop',
-    status: 'in-progress',
-    quarter: 'Q3-Q4 2026',
-    icon: Globe,
-  },
-  {
-    id: 'cliApiMcp',
-    status: 'planned',
-    quarter: 'Q2-Q3 2026',
-    icon: Terminal,
-  },
-  { id: 'workflows', status: 'planned', quarter: 'Q3 2026', icon: Workflow },
-  { id: 'notebook', status: 'planned', quarter: 'Q3 2026', icon: Code2 },
-  { id: 'roles', status: 'planned', quarter: 'Q3-Q4 2026', icon: Shield },
-  { id: 'marketplace', status: 'planned', quarter: 'Q4 2026', icon: Store },
+  { id: 'mvp', status: 'done', icon: Rocket },
+  { id: 'chatAi', status: 'done', icon: MessageCircle },
+  { id: 'openSource', status: 'done', icon: Github },
+  { id: 'presentations', status: 'in-progress', icon: Presentation },
+  { id: 'templates', status: 'in-progress', icon: Layers },
+  { id: 'interop', status: 'in-progress', icon: Globe },
+  { id: 'cliApiMcp', status: 'planned', icon: Terminal },
+  { id: 'workflows', status: 'planned', icon: Workflow },
+  { id: 'notebook', status: 'planned', icon: Code2 },
+  { id: 'roles', status: 'planned', icon: Shield },
+  { id: 'marketplace', status: 'planned', icon: Store },
 ];
 
 export const statusConfig: Record<

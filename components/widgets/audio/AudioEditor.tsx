@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Label } from '@/components/ui';
@@ -29,6 +29,13 @@ const STYLE_OPTIONS = [
   { value: 'debate', label: 'Debat' },
 ];
 
+const TTS_OPTIONS = [
+  { value: 'openai', label: 'OpenAI' },
+  { value: 'mistral', label: 'Mistral' },
+  { value: 'elevenlabs', label: 'ElevenLabs' },
+  { value: 'gemini', label: 'Gemini' },
+] as const;
+
 const SPEAKER_COLORS: Record<string, string> = {
   host: 'bg-blue-100 text-blue-800 border-blue-200',
   expert: 'bg-amber-100 text-amber-800 border-amber-200',
@@ -39,13 +46,28 @@ export function AudioEditor({ data, onSave, widget }: WidgetEditorProps) {
   const audio = getWidgetConfig('AUDIO', data);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ttsAvailability, setTtsAvailability] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!widget?.studioId) return;
+    fetch(`/api/studios/${widget.studioId}/tts-providers`)
+      .then((res) => res.json())
+      .then((data) => {
+        const avail: Record<string, boolean> = {};
+        for (const p of data.providers ?? []) {
+          avail[p.key] = p.available;
+        }
+        setTtsAvailability(avail);
+      })
+      .catch(() => {});
+  }, [widget?.studioId]);
 
   const config = audio.generationConfig ?? {
     targetDuration: '5' as const,
     tone: 'professional' as const,
     style: 'discussion' as const,
     speakerCount: '2' as const,
-    ttsProvider: 'gemini' as const,
+    ttsProvider: 'openai' as const,
   };
 
   const updateConfig = (updates: Partial<typeof config>) => {
@@ -63,7 +85,7 @@ export function AudioEditor({ data, onSave, widget }: WidgetEditorProps) {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ generationConfig: config }),
+          body: JSON.stringify({ generationConfig: config, ttsProvider: config.ttsProvider }),
         }
       );
 
@@ -210,6 +232,29 @@ export function AudioEditor({ data, onSave, widget }: WidgetEditorProps) {
               <User className="h-3 w-3 mr-1" />
               2 voix (dialogue)
             </Button>
+          </div>
+        </div>
+
+        {/* TTS Provider */}
+        <div>
+          <label className="text-xs font-medium mb-1 block text-muted-foreground">Synthese vocale</label>
+          <div className="flex gap-1.5 flex-wrap">
+            {TTS_OPTIONS.map((opt) => {
+              const available = ttsAvailability[opt.value] !== false;
+              return (
+                <Button
+                  key={opt.value}
+                  variant={config.ttsProvider === opt.value ? 'default' : 'outline'}
+                  size="sm"
+                  disabled={!available}
+                  onClick={() => updateConfig({ ttsProvider: opt.value })}
+                  className={!available ? 'opacity-50 cursor-not-allowed' : ''}
+                  title={!available ? 'Cle API non configuree' : undefined}
+                >
+                  {opt.label}
+                </Button>
+              );
+            })}
           </div>
         </div>
       </div>

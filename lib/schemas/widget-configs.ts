@@ -408,7 +408,7 @@ export const AudioConfigSchema = z.object({
     tone: z.enum(['casual', 'professional', 'academic']).default('professional'),
     style: z.enum(['interview', 'discussion', 'lecture', 'debate']).default('discussion'),
     speakerCount: z.enum(['1', '2']).default('2'),
-    ttsProvider: z.enum(['gemini', 'openai', 'elevenlabs']).default('gemini'),
+    ttsProvider: z.enum(['openai', 'mistral', 'elevenlabs', 'gemini']).default('openai'),
   }).optional(),
 });
 
@@ -454,7 +454,7 @@ export const VideoConfigSchema = z.object({
     slideCount: z.number().min(3).max(30).default(8),
     targetDuration: z.enum(['1', '3', '5', '10']).default('3'),
     tone: z.enum(['casual', 'professional', 'academic']).default('professional'),
-    ttsProvider: z.enum(['gemini', 'openai', 'elevenlabs']).default('gemini'),
+    ttsProvider: z.enum(['openai', 'mistral', 'elevenlabs', 'gemini']).default('openai'),
     includeSubtitles: z.boolean().default(true),
     includeSlideImages: z.boolean().default(false),
     imageProvider: z.enum(['gemini', 'dall-e-3']).default('gemini'),

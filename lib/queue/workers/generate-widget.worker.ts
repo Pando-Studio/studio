@@ -134,9 +134,10 @@ async function processJob(
           const script = generatedData.script as { segments: Array<{ id: string; speakerId: string; text: string; type: string }> };
           const voices = generatedData.voices as Array<{ id: string; name: string; role: string }> | undefined;
 
-          logger.generation('Generating podcast audio (TTS)', { runId, segmentCount: script.segments.length });
+          const ttsProvider = ((inputs as Record<string, unknown>).ttsProvider as string) || 'openai';
+          logger.generation(`Generating podcast audio (TTS: ${ttsProvider})`, { runId, segmentCount: script.segments.length });
 
-          const audioResult = await generatePodcastAudio(script, voices, studioId);
+          const audioResult = await generatePodcastAudio(script, voices, studioId, ttsProvider as import('../../ai/tts').TTSProviderKey);
           generatedData.audioUrl = audioResult.audioUrl;
           generatedData.duration = audioResult.durationSeconds;
           generatedData.transcript = audioResult.transcript;
@@ -157,9 +158,10 @@ async function processJob(
           const { generateVideoNarration } = await import('../../ai/tts');
           const script = generatedData.script as { slides: Array<{ id: string; narration: string }> };
 
-          logger.generation('Generating video narration (TTS)', { runId, slideCount: script.slides.length });
+          const videoTtsProvider = ((inputs as Record<string, unknown>).ttsProvider as string) || 'openai';
+          logger.generation(`Generating video narration (TTS: ${videoTtsProvider})`, { runId, slideCount: script.slides.length });
 
-          const narrationResult = await generateVideoNarration(script.slides, studioId);
+          const narrationResult = await generateVideoNarration(script.slides, studioId, videoTtsProvider as import('../../ai/tts').TTSProviderKey);
 
           // Attach audio URLs to each slide
           const updatedSlides = script.slides.map((slide) => ({

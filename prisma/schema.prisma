@@ -661,6 +661,7 @@ enum AIProvider {
   OPENAI
   ANTHROPIC
   GOOGLE
+  ELEVENLABS
 }
 
 enum GenerationRunType {

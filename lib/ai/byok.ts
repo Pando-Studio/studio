@@ -46,7 +46,7 @@ function encrypt(text: string): string {
   return encryptAES(text);
 }
 
-function decrypt(encrypted: string): string {
+export function decrypt(encrypted: string): string {
   if (encrypted.startsWith(AES_PREFIX)) {
     return decryptAES(encrypted);
   }
@@ -343,6 +343,12 @@ export async function validateApiKey(
         const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
         );
+        return { valid: response.ok };
+      }
+      case 'elevenlabs': {
+        const response = await fetch('https://api.elevenlabs.io/v1/user', {
+          headers: { 'xi-api-key': apiKey },
+        });
         return { valid: response.ok };
       }
       default:

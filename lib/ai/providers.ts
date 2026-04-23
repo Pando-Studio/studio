@@ -3,9 +3,10 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { prisma, type AIProvider } from '@/lib/db';
+import { decrypt } from './byok';
 
 // Types
-export type ProviderKey = 'mistral' | 'openai' | 'anthropic' | 'google';
+export type ProviderKey = 'mistral' | 'openai' | 'anthropic' | 'google' | 'elevenlabs';
 
 export interface ProviderInfo {
   name: string;
@@ -52,6 +53,13 @@ export const PROVIDER_INFO: Record<ProviderKey, ProviderInfo> = {
       image: 'gemini-3-pro-image-preview',
     },
   },
+  elevenlabs: {
+    name: 'ElevenLabs',
+    description: 'Synthese vocale haute qualite',
+    models: {
+      chat: '',
+    },
+  },
 };
 
 // Map Prisma enum to ProviderKey
@@ -60,6 +68,7 @@ const enumToKey: Record<AIProvider, ProviderKey> = {
   OPENAI: 'openai',
   ANTHROPIC: 'anthropic',
   GOOGLE: 'google',
+  ELEVENLABS: 'elevenlabs',
 };
 
 const keyToEnum: Record<ProviderKey, AIProvider> = {
@@ -67,6 +76,7 @@ const keyToEnum: Record<ProviderKey, AIProvider> = {
   openai: 'OPENAI',
   anthropic: 'ANTHROPIC',
   google: 'GOOGLE',
+  elevenlabs: 'ELEVENLABS',
 };
 
 // Create provider instance with API key
@@ -80,6 +90,8 @@ function createProvider(provider: ProviderKey, apiKey: string) {
       return createAnthropic({ apiKey });
     case 'google':
       return createGoogleGenerativeAI({ apiKey });
+    case 'elevenlabs':
+      throw new Error('ElevenLabs is TTS-only, not a chat provider');
     default:
       throw new Error(`Unknown provider: ${provider}`);
   }
@@ -92,6 +104,7 @@ export function getDefaultProvider(provider: ProviderKey) {
     openai: process.env.OPENAI_API_KEY || '',
     anthropic: process.env.ANTHROPIC_API_KEY || '',
     google: process.env.GOOGLE_API_KEY || '',
+    elevenlabs: process.env.ELEVENLABS_API_KEY || '',
   };
 
   const apiKey = envKeys[provider];
@@ -135,18 +148,20 @@ export async function getProviderForStudio(
     || undefined;
 
   // Priority order for providers
-  const priorityOrder: ProviderKey[] = effectivePreferred
-    ? [effectivePreferred, 'mistral', 'openai', 'anthropic', 'google'].filter(
+  // ElevenLabs is TTS-only, exclude from chat provider resolution
+  const chatProviders: ProviderKey[] = ['mistral', 'openai', 'anthropic', 'google'];
+  const priorityOrder: ProviderKey[] = effectivePreferred && effectivePreferred !== 'elevenlabs'
+    ? [effectivePreferred, ...chatProviders].filter(
         (v, i, a) => a.indexOf(v) === i
       ) as ProviderKey[]
-    : ['mistral', 'openai', 'anthropic', 'google'];
+    : chatProviders;
 
   // 1. Studio-level BYOK configs
   const studioBYOK = await prisma.providerConfig.findMany({
     where: { studioId, isActive: true },
   });
   const studioByokMap = new Map(
-    studioBYOK.map((config) => [enumToKey[config.provider], config.apiKey])
+    studioBYOK.map((config) => [enumToKey[config.provider], decrypt(config.apiKey)])
   );
 
   // 2. User-level BYOK configs
@@ -156,7 +171,7 @@ export async function getProviderForStudio(
       where: { userId: studio.userId, isActive: true },
     });
     userByokMap = new Map(
-      userBYOK.map((config) => [enumToKey[config.provider], config.apiKey])
+      userBYOK.map((config) => [enumToKey[config.provider], decrypt(config.apiKey)])
     );
   }
 
@@ -196,6 +211,7 @@ function getEnvApiKey(provider: ProviderKey): string | null {
     openai: process.env.OPENAI_API_KEY,
     anthropic: process.env.ANTHROPIC_API_KEY,
     google: process.env.GOOGLE_API_KEY,
+    elevenlabs: process.env.ELEVENLABS_API_KEY,
   };
 
   return envKeys[provider] || null;
@@ -272,7 +288,7 @@ export async function getApiKeyForProvider(
   const studioConfig = await prisma.providerConfig.findUnique({
     where: { studioId_provider: { studioId, provider: keyToEnum[provider] } },
   });
-  if (studioConfig?.isActive) return studioConfig.apiKey;
+  if (studioConfig?.isActive) return decrypt(studioConfig.apiKey);
 
   // User BYOK
   const studio = await prisma.studio.findUnique({
@@ -283,7 +299,7 @@ export async function getApiKeyForProvider(
     const userConfig = await prisma.userProviderConfig.findUnique({
       where: { userId_provider: { userId: studio.userId, provider: keyToEnum[provider] } },
     });
-    if (userConfig?.isActive) return userConfig.apiKey;
+    if (userConfig?.isActive) return decrypt(userConfig.apiKey);
   }
 
   // Env

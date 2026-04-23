@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Label } from '@/components/ui';
@@ -28,6 +28,13 @@ const TONE_OPTIONS = [
   { value: 'academic', label: 'Academique' },
 ];
 
+const TTS_OPTIONS = [
+  { value: 'openai', label: 'OpenAI' },
+  { value: 'mistral', label: 'Mistral' },
+  { value: 'elevenlabs', label: 'ElevenLabs' },
+  { value: 'gemini', label: 'Gemini' },
+] as const;
+
 const LAYOUT_ICONS: Record<string, typeof Layout> = {
   title: Layout,
   content: FileText,
@@ -41,13 +48,28 @@ export function VideoEditor({ data, onSave, widget }: WidgetEditorProps) {
   const video = getWidgetConfig('VIDEO', data);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [ttsAvailability, setTtsAvailability] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!widget?.studioId) return;
+    fetch(`/api/studios/${widget.studioId}/tts-providers`)
+      .then((res) => res.json())
+      .then((data) => {
+        const avail: Record<string, boolean> = {};
+        for (const p of data.providers ?? []) {
+          avail[p.key] = p.available;
+        }
+        setTtsAvailability(avail);
+      })
+      .catch(() => {});
+  }, [widget?.studioId]);
 
   const config = video.generationConfig ?? {
     mode: 'slideshow' as const,
     slideCount: 8,
     targetDuration: '3' as const,
     tone: 'professional' as const,
-    ttsProvider: 'gemini' as const,
+    ttsProvider: 'openai' as const,
     includeSubtitles: true,
     includeSlideImages: false,
     imageProvider: 'gemini' as const,
@@ -68,7 +90,7 @@ export function VideoEditor({ data, onSave, widget }: WidgetEditorProps) {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mode: 'video-narration' }),
+          body: JSON.stringify({ mode: 'video-narration', ttsProvider: config.ttsProvider }),
         }
       );
 
@@ -210,6 +232,29 @@ export function VideoEditor({ data, onSave, widget }: WidgetEditorProps) {
                 {opt.label}
               </Button>
             ))}
+          </div>
+        </div>
+
+        {/* TTS Provider */}
+        <div>
+          <label className="text-xs font-medium mb-1 block text-muted-foreground">Synthese vocale</label>
+          <div className="flex gap-1.5 flex-wrap">
+            {TTS_OPTIONS.map((opt) => {
+              const available = ttsAvailability[opt.value] !== false;
+              return (
+                <Button
+                  key={opt.value}
+                  variant={config.ttsProvider === opt.value ? 'default' : 'outline'}
+                  size="sm"
+                  disabled={!available}
+                  onClick={() => updateConfig({ ttsProvider: opt.value })}
+                  className={!available ? 'opacity-50 cursor-not-allowed' : ''}
+                  title={!available ? 'Cle API non configuree' : undefined}
+                >
+                  {opt.label}
+                </Button>
+              );
+            })}
           </div>
         </div>
       </div>

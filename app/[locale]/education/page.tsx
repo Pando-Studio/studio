@@ -33,6 +33,7 @@ import {
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 /* -------------------------------------------------------------------------- */
 /*  Types                                                                     */
@@ -117,6 +118,9 @@ export default function EducationPage() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
             <a href="/dashboard" className="hidden sm:block">
               <Button className="bg-yellow-500 hover:bg-yellow-400 text-neutral-950 text-sm font-bold font-display px-5 rounded-lg">
                 {tNav('getStarted')}

@@ -46,6 +46,7 @@ import {
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 /* -------------------------------------------------------------------------- */
 /*  Widget Catalog Data                                                       */
@@ -170,35 +171,6 @@ function WidgetCatalog() {
         })}
       </div>
     </>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Language Switcher                                                         */
-/* -------------------------------------------------------------------------- */
-
-function LanguageSwitcher() {
-  const pathname = usePathname();
-  const router = useRouter();
-
-  return (
-    <div className="flex items-center gap-1 text-xs font-display font-semibold text-muted-foreground">
-      <button
-        type="button"
-        onClick={() => router.replace(pathname, { locale: 'en' })}
-        className="px-1.5 py-0.5 rounded hover:text-landing-text transition-colors"
-      >
-        EN
-      </button>
-      <span className="text-landing-border">/</span>
-      <button
-        type="button"
-        onClick={() => router.replace(pathname, { locale: 'fr' })}
-        className="px-1.5 py-0.5 rounded hover:text-landing-text transition-colors"
-      >
-        FR
-      </button>
-    </div>
   );
 }
 
@@ -796,6 +768,12 @@ export default function HomePage() {
                 className="hover:text-landing-text transition-colors"
               >
                 {t('footer.aiAct')}
+              </Link>
+              <Link
+                href="/on-premise"
+                className="hover:text-landing-text transition-colors"
+              >
+                {t('footer.onPremise')}
               </Link>
               <a
                 href="https://qiplim.com"

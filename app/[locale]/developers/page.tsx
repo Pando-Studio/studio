@@ -42,6 +42,7 @@ import {
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 /* -------------------------------------------------------------------------- */
 /*  Widget type data (matches llms.txt -- 24 types)                           */
@@ -126,35 +127,6 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
       <pre className="bg-slate-900 text-slate-100 rounded-lg p-4 pt-5 overflow-x-auto text-sm leading-relaxed font-mono">
         <code>{code}</code>
       </pre>
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Language Switcher                                                          */
-/* -------------------------------------------------------------------------- */
-
-function LanguageSwitcher() {
-  const pathname = usePathname();
-  const router = useRouter();
-
-  return (
-    <div className="flex items-center gap-1 text-xs font-display font-semibold text-muted-foreground">
-      <button
-        type="button"
-        onClick={() => router.replace(pathname, { locale: 'en' })}
-        className="px-1.5 py-0.5 rounded hover:text-landing-text transition-colors"
-      >
-        EN
-      </button>
-      <span className="text-landing-border">/</span>
-      <button
-        type="button"
-        onClick={() => router.replace(pathname, { locale: 'fr' })}
-        className="px-1.5 py-0.5 rounded hover:text-landing-text transition-colors"
-      >
-        FR
-      </button>
     </div>
   );
 }

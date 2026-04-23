@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getStudioAuthContext, requireStudioAccess } from '@/lib/api/auth-context';
+import { getStudioAuthContext, getPublicStudioAccess } from '@/lib/api/auth-context';
 import { logger } from '@/lib/monitoring/logger';
 import { validateBody, updateStudioSchema } from '@/lib/api/schemas';
 
@@ -10,7 +10,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const ctx = await requireStudioAccess(id);
+    const ctx = await getPublicStudioAccess(id);
     if ('error' in ctx) {
       return NextResponse.json({ error: ctx.error }, { status: ctx.status });
     }

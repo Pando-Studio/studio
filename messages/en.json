@@ -9,8 +9,8 @@
   },
   "hero": {
     "badge": "Open-source NotebookLM alternative",
-    "title": "Turn any document into learning experiences",
-    "subtitle": "Like NotebookLM, but open source and LLM-agnostic. Upload PDFs, URLs, or Drive files \u2014 generate podcasts, quizzes, summaries, flashcards, presentations, and 20+ formats. Self-host with your own AI keys.",
+    "title": "Any document to any content",
+    "subtitle": "Open source NotebookLM alternative. Upload PDFs, URLs, or Drive files \u2014 generate podcasts, quizzes, videos, summaries, flashcards, presentations, and 28 formats. Self-hostable, multi-provider, LLM-agnostic.",
     "cta": "Get started free",
     "github": "View on GitHub"
   },

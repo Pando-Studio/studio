@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "description": "AI-powered interactive learning content from any document",
+  "description": "Open source NotebookLM alternative — any document to any content. Self-hostable, multi-provider.",
   "repository": {
     "type": "git",
     "url": "https://github.com/Qiplim/studio.git"

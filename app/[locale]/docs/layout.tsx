@@ -15,6 +15,7 @@ import {
   X,
   ChevronRight,
 } from 'lucide-react';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 interface NavItem {
   labelKey: string;
@@ -51,9 +52,12 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             <Logo size="sm" href="/" />
             <span className="text-sm text-muted-foreground">/ {t('documentation')}</span>
           </div>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/">{t('backToHome')}</Link>
-          </Button>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/">{t('backToHome')}</Link>
+            </Button>
+          </div>
         </div>
       </header>
 

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import {
   ArrowLeft,
   Shield,
@@ -92,10 +93,13 @@ export default function AIActPage() {
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8">
-          <ArrowLeft className="h-4 w-4" />
-          {t('backToHome')}
-        </Link>
+        <div className="flex items-center justify-between mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="h-4 w-4" />
+            {t('backToHome')}
+          </Link>
+          <LanguageSwitcher />
+        </div>
 
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">

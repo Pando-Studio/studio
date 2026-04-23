@@ -194,6 +194,69 @@ async function processJob(
       }
     }
 
+    // Step 4b: Generate slide images (optional, when includeSlideImages is true)
+    if (isVideoGeneration && generatedData.script) {
+      const genConfig = (inputs as Record<string, unknown>);
+      const includeSlideImages = genConfig.includeSlideImages === true;
+      if (includeSlideImages) {
+        const slides = (generatedData.script as { slides: Array<Record<string, unknown>> }).slides;
+        const slidesWithPrompt = slides.filter((s) => s.imagePrompt);
+        if (slidesWithPrompt.length > 0) {
+          try {
+            logger.generation('Generating slide images', { runId, count: slidesWithPrompt.length });
+            await updateRunProgress(runId, studioId, {
+              step: 'images',
+              label: `Generation des images (0/${slidesWithPrompt.length})...`,
+              progress: 72,
+            });
+
+            const { generateImage } = await import('../../ai/image-generation');
+            const imageProvider = (genConfig.imageProvider as string) || 'gemini';
+            const preferredModel = imageProvider === 'dall-e-3' ? 'dall-e-3' : undefined;
+
+            for (let i = 0; i < slides.length; i++) {
+              const slide = slides[i];
+              if (!slide.imagePrompt) continue;
+
+              try {
+                const imageResult = await generateImage(
+                  `${slide.imagePrompt}. Style: cinematic, high quality, 16:9 aspect ratio, suitable as presentation slide background.`,
+                  studioId,
+                  preferredModel,
+                );
+                slide.imageUrl = imageResult.imageUrl;
+                // Switch layout to 'image' to use the ImageSlide component
+                slide.layout = 'image';
+
+                await updateRunProgress(runId, studioId, {
+                  step: 'images',
+                  label: `Generation des images (${i + 1}/${slidesWithPrompt.length})...`,
+                  progress: 72 + Math.round((i / slidesWithPrompt.length) * 5),
+                });
+
+                logger.info('Slide image generated', { runId, slideId: slide.id, model: imageResult.model });
+              } catch (imgError) {
+                // Image failure is non-fatal per slide
+                logger.warn('Slide image generation failed', {
+                  runId,
+                  slideId: slide.id as string,
+                  error: imgError instanceof Error ? imgError.message : String(imgError),
+                });
+              }
+            }
+
+            generatedData.script = { slides };
+            logger.generation('Slide images generated', { runId, total: slidesWithPrompt.length });
+          } catch (imageError) {
+            logger.warn('Slide image generation step failed', {
+              runId,
+              error: imageError instanceof Error ? imageError.message : String(imageError),
+            });
+          }
+        }
+      }
+    }
+
     // Step 5: Video assembly (slideshow mode) — render slides + audio into MP4
     const assemblyCheck = {
       isVideoGeneration,

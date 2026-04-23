@@ -456,6 +456,8 @@ export const VideoConfigSchema = z.object({
     tone: z.enum(['casual', 'professional', 'academic']).default('professional'),
     ttsProvider: z.enum(['gemini', 'openai', 'elevenlabs']).default('gemini'),
     includeSubtitles: z.boolean().default(true),
+    includeSlideImages: z.boolean().default(false),
+    imageProvider: z.enum(['gemini', 'dall-e-3']).default('gemini'),
   }).optional(),
 });
 

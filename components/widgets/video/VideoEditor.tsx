@@ -49,6 +49,8 @@ export function VideoEditor({ data, onSave, widget }: WidgetEditorProps) {
     tone: 'professional' as const,
     ttsProvider: 'gemini' as const,
     includeSubtitles: true,
+    includeSlideImages: false,
+    imageProvider: 'gemini' as const,
   };
 
   const updateConfig = (updates: Partial<typeof config>) => {
@@ -210,6 +212,54 @@ export function VideoEditor({ data, onSave, widget }: WidgetEditorProps) {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Slide images */}
+      <div className="space-y-3 p-3 rounded-lg border">
+        <div className="flex items-center gap-2">
+          <ImageIcon className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs font-medium text-muted-foreground">Images des slides</span>
+        </div>
+        <div className="flex gap-1.5">
+          <Button
+            variant={!config.includeSlideImages ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => updateConfig({ includeSlideImages: false })}
+          >
+            Sans images
+          </Button>
+          <Button
+            variant={config.includeSlideImages ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => updateConfig({ includeSlideImages: true })}
+          >
+            Avec images IA
+          </Button>
+        </div>
+        {config.includeSlideImages && (
+          <div>
+            <label className="text-xs font-medium mb-1 block text-muted-foreground">Provider</label>
+            <div className="flex gap-1.5">
+              <Button
+                variant={config.imageProvider === 'gemini' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => updateConfig({ imageProvider: 'gemini' })}
+              >
+                Gemini 3
+              </Button>
+              <Button
+                variant={config.imageProvider === 'dall-e-3' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => updateConfig({ imageProvider: 'dall-e-3' })}
+              >
+                DALL-E 3
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Necessite une cle API {config.imageProvider === 'gemini' ? 'Google' : 'OpenAI'}. Cout supplementaire par image.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* External URL fallback */}

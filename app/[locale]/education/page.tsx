@@ -420,6 +420,12 @@ export default function EducationPage() {
               >
                 {tFooter('documentation')}
               </a>
+              <Link
+                href="/roadmap"
+                className="hover:text-landing-text transition-colors"
+              >
+                {tFooter('roadmap')}
+              </Link>
             </nav>
 
             <p className="text-sm text-muted-foreground">

@@ -18,6 +18,8 @@ import { PostitGenerationForm } from './PostitGenerationForm';
 import { RankingGenerationForm } from './RankingGenerationForm';
 import { OpentextGenerationForm } from './OpentextGenerationForm';
 import { ImageGenerationForm } from './ImageGenerationForm';
+import { AudioGenerationForm } from './AudioGenerationForm';
+import { VideoGenerationForm } from './VideoGenerationForm';
 
 export type GenerationType = 'QUIZ' | 'WORDCLOUD' | 'PRESENTATION' | 'ROLEPLAY' | 'COURSE_PLAN' | 'MULTIPLE_CHOICE' | 'POSTIT' | 'RANKING' | 'OPENTEXT' | 'IMAGE' | 'FAQ' | 'GLOSSARY' | 'SUMMARY' | 'FLASHCARD' | 'TIMELINE' | 'REPORT' | 'DATA_TABLE' | 'MINDMAP' | 'INFOGRAPHIC' | 'SYLLABUS' | 'SESSION_PLAN' | 'PROGRAM_OVERVIEW' | 'CLASS_OVERVIEW' | 'QCM' | 'AUDIO' | 'VIDEO';
 
@@ -207,6 +209,10 @@ export function GenerationModal({
         return <OpentextGenerationForm {...commonProps} />;
       case 'IMAGE':
         return <ImageGenerationForm {...commonProps} />;
+      case 'AUDIO':
+        return <AudioGenerationForm {...commonProps} />;
+      case 'VIDEO':
+        return <VideoGenerationForm {...commonProps} />;
       default:
         return null;
     }

@@ -257,6 +257,37 @@ export async function requireStudioAccess(
   return { userId, studio, effectiveRole };
 }
 
+/**
+ * Get studio access for potentially unauthenticated users.
+ * For public studios, returns viewer role even without auth.
+ * For private studios, falls back to requireStudioAccess.
+ */
+export async function getPublicStudioAccess(
+  studioId: string,
+): Promise<StudioAccessContext | AuthError> {
+  // Try authenticated access first
+  const authResult = await getAuthContext();
+  if (!('error' in authResult)) {
+    return requireStudioAccess(studioId);
+  }
+
+  // No auth — check if studio is public
+  const studio = await prisma.studio.findUnique({
+    where: { id: studioId },
+  });
+
+  if (!studio) {
+    return { error: 'Studio not found', status: 404 };
+  }
+
+  if (!studio.isPublic) {
+    return { error: 'Unauthorized', status: 401 };
+  }
+
+  // Public studio, anonymous viewer
+  return { userId: 'anonymous', studio, effectiveRole: 'viewer' };
+}
+
 /** Type guard to check if result is an error */
 export function isAuthError(result: unknown): result is AuthError {
   return typeof result === 'object' && result !== null && 'error' in result && 'status' in result;

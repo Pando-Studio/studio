@@ -15,25 +15,25 @@ const gtWalsheim = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Qiplim Studio — Any document to any learning content',
+  title: 'Qiplim Studio — Any document to any content',
   description:
-    'Open source AI platform that transforms documents into interactive learning content: quizzes, summaries, flashcards, podcasts, videos, presentations, and more. Self-hostable, multi-provider (Mistral, OpenAI, Anthropic, Google).',
+    'Open source NotebookLM alternative. Transform documents into quizzes, podcasts, videos, summaries, flashcards, presentations and 28 formats. Self-hostable, multi-provider (Mistral, OpenAI, Anthropic, Google).',
   icons: {
     icon: '/favicon.webp',
     apple: '/favicon.webp',
   },
   openGraph: {
-    title: 'Qiplim Studio — Any document to any learning content',
+    title: 'Qiplim Studio — Any document to any content',
     description:
-      'Open source AI platform that transforms documents into interactive learning content: quizzes, summaries, flashcards, podcasts, videos, presentations, and more.',
+      'Open source NotebookLM alternative. Transform documents into quizzes, podcasts, videos, summaries, flashcards, presentations and 28 formats. Self-hostable, multi-provider.',
     siteName: 'Qiplim Studio',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Qiplim Studio — Any document to any learning content',
+    title: 'Qiplim Studio — Any document to any content',
     description:
-      'Open source AI platform that transforms documents into interactive learning content. Self-hostable, multi-provider.',
+      'Open source NotebookLM alternative. Self-hostable, multi-provider.',
   },
 };
 

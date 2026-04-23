@@ -9,8 +9,8 @@
   },
   "hero": {
     "badge": "Alternative open source a NotebookLM",
-    "title": "Transformez vos documents en experiences d'apprentissage",
-    "subtitle": "Comme NotebookLM, mais open source et agnostique en LLM. Importez des PDF, URL ou fichiers Drive \u2014 generez des podcasts, quiz, resumes, flashcards, presentations, et 20+ formats. Auto-hebergeable avec vos propres cles IA.",
+    "title": "Tout document, tout contenu",
+    "subtitle": "Alternative open source a NotebookLM. Importez des PDF, URL ou fichiers Drive \u2014 generez des podcasts, quiz, videos, resumes, flashcards, presentations, et 28 formats. Auto-hebergeable, multi-provider, agnostique en LLM.",
     "cta": "Commencer gratuitement",
     "github": "Voir sur GitHub"
   },

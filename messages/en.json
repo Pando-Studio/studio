@@ -728,6 +728,12 @@
     "pandoStudio": "Pando Studio",
     "github": "GitHub",
     "discord": "Discord",
+    "legal": "Legal",
+    "termsOfUse": "Terms of Use",
+    "termsOfSale": "Terms of Sale",
+    "privacyPolicy": "Privacy Policy",
+    "aiAct": "AI Act Compliance",
+    "openCoreLicense": "Open Core License",
     "copyright": "© 2026 Pando Studio",
     "license": "MIT License"
   }

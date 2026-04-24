@@ -9,7 +9,7 @@ export function PublicFooter() {
   return (
     <footer className="bg-white border-t border-landing-border">
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Column 1: Brand */}
           <div>
             <p className="font-display font-bold text-lg mb-2">
@@ -41,12 +41,6 @@ export function PublicFooter() {
                 className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
               >
                 {t('onPremise')}
-              </Link>
-              <Link
-                href="/ai-act"
-                className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
-              >
-                {t('aiAct')}
               </Link>
               <Link
                 href="/roadmap"
@@ -109,6 +103,14 @@ export function PublicFooter() {
             </h3>
             <nav className="space-y-0">
               <a
+                href="https://qiplim.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
+              >
+                Qiplim
+              </a>
+              <a
                 href="https://pando-studio.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -131,6 +133,47 @@ export function PublicFooter() {
                 className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
               >
                 {t('discord')}
+              </a>
+            </nav>
+          </div>
+
+          {/* Column 5: Legal */}
+          <div>
+            <h3 className="font-display font-bold text-sm text-landing-text mb-4">
+              {t('legal')}
+            </h3>
+            <nav className="space-y-0">
+              <Link
+                href="/terms"
+                className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
+              >
+                {t('termsOfUse')}
+              </Link>
+              <Link
+                href="/terms-of-sale"
+                className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
+              >
+                {t('termsOfSale')}
+              </Link>
+              <Link
+                href="/privacy"
+                className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
+              >
+                {t('privacyPolicy')}
+              </Link>
+              <Link
+                href="/ai-act"
+                className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
+              >
+                {t('aiAct')}
+              </Link>
+              <a
+                href="https://github.com/Qiplim/studio/blob/main/LICENSE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block py-1 text-sm text-muted-foreground hover:text-landing-text transition-colors"
+              >
+                {t('openCoreLicense')}
               </a>
             </nav>
           </div>

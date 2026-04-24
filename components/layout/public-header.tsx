@@ -40,12 +40,6 @@ export function PublicHeader() {
                 >
                   {t('onPremise')}
                 </Link>
-                <Link
-                  href="/ai-act"
-                  className="block px-3 py-2 text-sm text-muted-foreground hover:text-landing-text hover:bg-muted rounded-md transition-colors"
-                >
-                  {t('aiAct')}
-                </Link>
               </div>
             </div>
           </div>
@@ -121,13 +115,6 @@ export function PublicHeader() {
             onClick={() => setMobileOpen(false)}
           >
             {t('onPremise')}
-          </Link>
-          <Link
-            href="/ai-act"
-            className="block px-3 py-2 text-sm text-muted-foreground hover:text-landing-text transition-colors"
-            onClick={() => setMobileOpen(false)}
-          >
-            {t('aiAct')}
           </Link>
 
           <hr className="my-2 border-landing-border" />

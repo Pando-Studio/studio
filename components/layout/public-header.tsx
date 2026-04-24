@@ -15,8 +15,13 @@ export function PublicHeader() {
     <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white/95 backdrop-blur-md border-b border-landing-border">
       <div className="max-w-6xl mx-auto h-full px-4 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="font-display font-bold text-lg">
-          Qiplim <span className="text-yellow-500">Studio</span>
+        <Link href="/" className="flex flex-col leading-tight">
+          <span className="font-display font-bold text-lg">
+            Qiplim <span className="text-yellow-500">Studio</span>
+          </span>
+          <span className="text-[10px] text-muted-foreground font-medium hidden sm:block">
+            {t('tagline')}
+          </span>
         </Link>
 
         {/* Desktop nav */}

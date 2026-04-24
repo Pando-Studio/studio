@@ -701,6 +701,7 @@
     }
   },
   "publicNav": {
+    "tagline": "Alternative open source a NotebookLM",
     "product": "Produit",
     "useCases": "Cas d'usage",
     "onPremise": "On-Premise",

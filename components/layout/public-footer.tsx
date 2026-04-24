@@ -181,7 +181,7 @@ export function PublicFooter() {
 
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-landing-border text-center text-sm text-muted-foreground">
-          {t('copyright')} · {t('license')}
+          {t('copyright')}
         </div>
       </div>
     </footer>

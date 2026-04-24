@@ -226,9 +226,10 @@ export default function PricingPage() {
                   <Feature included>{t('community.feature2')}</Feature>
                   <Feature included>{t('community.feature3')}</Feature>
                   <Feature included>{t('community.feature4')}</Feature>
-                  <Feature included={false}>{t('community.feature5')}</Feature>
+                  <Feature included>{t('community.feature5')}</Feature>
                   <Feature included={false}>{t('community.feature6')}</Feature>
                   <Feature included={false}>{t('community.feature7')}</Feature>
+                  <Feature included={false}>{t('community.feature8')}</Feature>
                 </ul>
                 <Button
                   variant="outline"
@@ -251,7 +252,8 @@ export default function PricingPage() {
             <Card className="border-2 border-yellow-500 bg-white relative">
               <CardHeader className="pb-4">
                 <CardTitle className="font-display text-xl">{t('enterprise.name')}</CardTitle>
-                <div className="mt-2 flex items-baseline gap-1">
+                <p className="text-xs text-muted-foreground mt-2 font-display font-medium">{t('enterprise.badge')}</p>
+                <div className="flex items-baseline gap-1">
                   <span className="font-display font-extrabold text-4xl text-landing-text">
                     {t('enterprise.price')}
                   </span>
@@ -266,6 +268,7 @@ export default function PricingPage() {
                   <Feature included>{t('enterprise.feature3')}</Feature>
                   <Feature included>{t('enterprise.feature4')}</Feature>
                   <Feature included>{t('enterprise.feature5')}</Feature>
+                  <Feature included>{t('enterprise.feature6')}</Feature>
                 </ul>
                 <Button
                   className="w-full bg-yellow-500 hover:bg-yellow-400 text-neutral-950 font-display font-bold rounded-lg"

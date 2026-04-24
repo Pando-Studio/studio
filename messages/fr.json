@@ -627,5 +627,108 @@
         "description": "Niveaux Community / Verified / Official, publication et decouverte de templates, CLI Widget Dev Kit (init, test, publish)."
       }
     }
+  },
+  "pricing": {
+    "badge": "Tarifs",
+    "title": "Des tarifs simples et transparents",
+    "subtitle": "Commencez gratuitement, passez au niveau superieur quand vous en avez besoin. Auto-hebergez pour un controle total, ou laissez-nous gerer l'infrastructure.",
+    "cloudTitle": "Cloud",
+    "selfHostedTitle": "Auto-heberge",
+    "free": {
+      "name": "Gratuit",
+      "price": "0\u20ac",
+      "subtitle": "Decouvrez Studio",
+      "feature1": "5 generations de texte/jour",
+      "feature2": "Tous les widgets texte (Quiz, Resume, Flashcard...)",
+      "feature3": "Generation audio, image, video",
+      "feature4": "Presentations",
+      "feature5": "BYOK (Bring Your Own Key)",
+      "cta": "Commencer gratuitement"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "9,99\u20ac",
+      "period": "/mois",
+      "badge": "Recommande",
+      "subtitle": "Pour les professionnels et les equipes",
+      "feature1": "100 generations de texte/jour",
+      "feature2": "5 generations audio/jour",
+      "feature3": "3 generations d'images/jour",
+      "feature4": "10 presentations/jour",
+      "feature5": "BYOK = generations illimitees",
+      "feature6": "Support par email",
+      "cta": "Passer au Pro"
+    },
+    "community": {
+      "name": "Community",
+      "price": "Gratuit",
+      "subtitle": "Toute la puissance, votre infrastructure",
+      "feature1": "Tout est inclus",
+      "feature2": "Generations illimitees (vos cles API)",
+      "feature3": "Les 28 types de widgets",
+      "feature4": "API, MCP, controle total",
+      "feature5": "SSO / SAML",
+      "feature6": "Roles personnalises & permissions",
+      "feature7": "Journal d'audit",
+      "cta": "Voir sur GitHub"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": "49\u20ac",
+      "period": "/mois",
+      "subtitle": "Pour les organisations",
+      "feature1": "Tout ce qui est dans Community",
+      "feature2": "SSO / SAML",
+      "feature3": "Roles personnalises & permissions granulaires",
+      "feature4": "Journal d'audit",
+      "feature5": "Support prioritaire",
+      "cta": "Nous contacter"
+    },
+    "faq": {
+      "title": "Questions frequentes",
+      "byokQ": "Qu'est-ce que le BYOK ?",
+      "byokA": "BYOK (Bring Your Own Key) vous permet de connecter vos propres cles API de fournisseurs comme OpenAI, Mistral ou Anthropic. Avec BYOK active sur le plan Pro, vos generations deviennent illimitees puisque vous payez directement le fournisseur.",
+      "cancelQ": "Puis-je annuler a tout moment ?",
+      "cancelA": "Oui, vous pouvez annuler votre abonnement Pro a tout moment. Vous conservez l'acces jusqu'a la fin de votre periode de facturation en cours.",
+      "limitQ": "Que se passe-t-il quand j'atteins ma limite quotidienne ?",
+      "limitA": "Vous ne pourrez plus generer de nouveau contenu jusqu'au lendemain (les limites se reintialisent a minuit UTC). Le contenu existant reste entierement accessible. Passez au Pro ou activez BYOK pour des limites plus elevees.",
+      "selfHostedFreeQ": "La version auto-hebergee est-elle vraiment gratuite ?",
+      "selfHostedFreeA": "Oui, l'edition Community est 100% gratuite et open source (AGPLv3). Vous fournissez votre propre serveur, base de donnees et cles API. Il n'y a pas de frais caches ni de limites d'utilisation.",
+      "enterpriseQ": "Que comprend la licence Enterprise ?",
+      "enterpriseA": "Enterprise ajoute l'authentification SSO/SAML, des roles personnalises avec des permissions granulaires, la journalisation d'audit et un support prioritaire. Elle est concue pour les organisations qui ont besoin de conformite et de controle d'acces.",
+      "educationQ": "Proposez-vous des tarifs education ?",
+      "educationA": "Oui ! Les etablissements d'enseignement peuvent beneficier de tarifs speciaux. Contactez-nous a contact@pando-studio.com avec les details de votre etablissement et nous vous proposerons un plan adapte."
+    }
+  },
+  "publicNav": {
+    "product": "Produit",
+    "useCases": "Cas d'usage",
+    "onPremise": "On-Premise",
+    "aiAct": "IA Act",
+    "developers": "Developpeurs",
+    "pricing": "Tarifs",
+    "roadmap": "Roadmap",
+    "github": "GitHub",
+    "getStarted": "Commencer"
+  },
+  "publicFooter": {
+    "tagline": "Moteur de contenu IA open source. Tout document, tout format.",
+    "product": "Produit",
+    "developers": "Developpeurs",
+    "company": "Entreprise",
+    "useCases": "Cas d'usage",
+    "pricing": "Tarifs",
+    "onPremise": "On-Premise",
+    "aiAct": "IA Act",
+    "roadmap": "Roadmap",
+    "apiDocs": "API Docs",
+    "widgetTypes": "Types de widgets",
+    "selfHosting": "Auto-hebergement",
+    "mcpServer": "Serveur MCP",
+    "pandoStudio": "Pando Studio",
+    "github": "GitHub",
+    "discord": "Discord",
+    "copyright": "© 2026 Pando Studio",
+    "license": "Licence MIT"
   }
 }

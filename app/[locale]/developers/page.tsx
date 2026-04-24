@@ -12,7 +12,6 @@ import {
   Check,
   ExternalLink,
   FileJson,
-  Github,
   Key,
   Layers,
   Search,
@@ -41,8 +40,8 @@ import {
 } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Link, usePathname, useRouter } from '@/i18n/navigation';
-import { LanguageSwitcher } from '@/components/language-switcher';
+import { PublicHeader } from '@/components/layout/public-header';
+import { PublicFooter } from '@/components/layout/public-footer';
 
 /* -------------------------------------------------------------------------- */
 /*  Widget type data (matches llms.txt -- 24 types)                           */
@@ -155,33 +154,7 @@ export default function DevelopersPage() {
 
   return (
     <div className="min-h-screen font-sans bg-white">
-      {/* ================================================================ */}
-      {/*  Nav                                                             */}
-      {/* ================================================================ */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-landing-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="font-display font-bold text-lg text-landing-text">
-              Qiplim <span className="text-landing-brand">Studio</span>
-            </span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#quick-start" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">{t('navQuickStart')}</a>
-            <a href="#widget-types" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">{t('navWidgetTypes')}</a>
-            <a href="#api-reference" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">{t('navApiReference')}</a>
-            <a href="#mcp-server" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">{t('navMcpServer')}</a>
-            <a href="https://github.com/Qiplim/studio" target="_blank" rel="noopener noreferrer" className="text-sm font-display font-semibold text-muted-foreground hover:text-landing-text transition-colors">GitHub</a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
-            <a href="/dashboard">
-              <Button className="bg-yellow-500 hover:bg-yellow-400 text-neutral-950 text-sm font-bold font-display px-5 rounded-lg">
-                {t('getStarted')}
-              </Button>
-            </a>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* ================================================================ */}
       {/*  Hero                                                            */}
@@ -649,75 +622,7 @@ Content-Type: application/json`}
         </div>
       </section>
 
-      {/* ================================================================ */}
-      {/*  Footer                                                          */}
-      {/* ================================================================ */}
-      <footer className="bg-white border-t border-landing-border py-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-            <nav className="flex items-center gap-6 text-sm font-display font-medium text-muted-foreground">
-              <a
-                href="https://github.com/Qiplim/studio"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-landing-text transition-colors flex items-center gap-1.5"
-              >
-                <Github className="w-4 h-4" />
-                GitHub
-              </a>
-              <a
-                href="https://discord.gg/qiplim"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-landing-text transition-colors"
-              >
-                Discord
-              </a>
-              <a
-                href="/api/v1/openapi.json"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-landing-text transition-colors"
-              >
-                OpenAPI Spec
-              </a>
-              <a
-                href="/llms.txt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-landing-text transition-colors"
-              >
-                llms.txt
-              </a>
-              <Link
-                href="/roadmap"
-                className="hover:text-landing-text transition-colors"
-              >
-                Roadmap
-              </Link>
-              <a
-                href="https://qiplim.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-landing-text transition-colors"
-              >
-                Qiplim
-              </a>
-              <a
-                href="https://pando-studio.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-landing-text transition-colors"
-              >
-                Pando Studio
-              </a>
-            </nav>
-            <p className="text-sm text-muted-foreground">
-              {t('footerLicense')}
-            </p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

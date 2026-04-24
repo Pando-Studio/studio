@@ -627,5 +627,108 @@
         "description": "Community / Verified / Official tiers, template publishing and discovery, Widget Dev Kit CLI (init, test, publish)."
       }
     }
+  },
+  "pricing": {
+    "badge": "Pricing",
+    "title": "Simple, transparent pricing",
+    "subtitle": "Start free, upgrade when you need more. Self-host for full control, or let us handle the infrastructure.",
+    "cloudTitle": "Cloud",
+    "selfHostedTitle": "Self-hosted",
+    "free": {
+      "name": "Free",
+      "price": "0\u20ac",
+      "subtitle": "Discover Studio",
+      "feature1": "5 text generations/day",
+      "feature2": "All text widgets (Quiz, Summary, Flashcard...)",
+      "feature3": "Audio, Image, Video generation",
+      "feature4": "Presentations",
+      "feature5": "BYOK (Bring Your Own Key)",
+      "cta": "Get started free"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "9,99\u20ac",
+      "period": "/month",
+      "badge": "Recommended",
+      "subtitle": "For professionals and teams",
+      "feature1": "100 text generations/day",
+      "feature2": "5 audio generations/day",
+      "feature3": "3 image generations/day",
+      "feature4": "10 presentations/day",
+      "feature5": "BYOK = unlimited generations",
+      "feature6": "Email support",
+      "cta": "Upgrade to Pro"
+    },
+    "community": {
+      "name": "Community",
+      "price": "Free",
+      "subtitle": "Full power, your infrastructure",
+      "feature1": "Everything included",
+      "feature2": "Unlimited generations (your API keys)",
+      "feature3": "All 28 widget types",
+      "feature4": "API, MCP, full control",
+      "feature5": "SSO / SAML",
+      "feature6": "Custom roles & permissions",
+      "feature7": "Audit log",
+      "cta": "View on GitHub"
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "price": "49\u20ac",
+      "period": "/month",
+      "subtitle": "For organizations",
+      "feature1": "Everything in Community",
+      "feature2": "SSO / SAML",
+      "feature3": "Custom roles & granular permissions",
+      "feature4": "Audit log",
+      "feature5": "Priority support",
+      "cta": "Contact us"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "byokQ": "What is BYOK?",
+      "byokA": "BYOK (Bring Your Own Key) lets you connect your own API keys from providers like OpenAI, Mistral, or Anthropic. With BYOK enabled on the Pro plan, your generations become unlimited since you pay the provider directly.",
+      "cancelQ": "Can I cancel anytime?",
+      "cancelA": "Yes, you can cancel your Pro subscription at any time. You'll keep access until the end of your current billing period.",
+      "limitQ": "What happens when I reach my daily limit?",
+      "limitA": "You won't be able to generate new content until the next day (limits reset at midnight UTC). Existing content remains fully accessible. Upgrade to Pro or enable BYOK for higher limits.",
+      "selfHostedFreeQ": "Is the self-hosted version really free?",
+      "selfHostedFreeA": "Yes, the Community edition is 100% free and open source (AGPLv3). You provide your own server, database, and API keys. There are no hidden fees or usage limits.",
+      "enterpriseQ": "What's included in the Enterprise license?",
+      "enterpriseA": "Enterprise adds SSO/SAML authentication, custom roles with granular permissions, audit logging, and priority support. It's designed for organizations that need compliance and access control features.",
+      "educationQ": "Do you offer education discounts?",
+      "educationA": "Yes! Educational institutions can get special pricing. Contact us at contact@pando-studio.com with your institution details and we'll set up a tailored plan."
+    }
+  },
+  "publicNav": {
+    "product": "Product",
+    "useCases": "Use Cases",
+    "onPremise": "On-Premise",
+    "aiAct": "AI Act",
+    "developers": "Developers",
+    "pricing": "Pricing",
+    "roadmap": "Roadmap",
+    "github": "GitHub",
+    "getStarted": "Get Started"
+  },
+  "publicFooter": {
+    "tagline": "Open-source AI content engine. Any document, any format.",
+    "product": "Product",
+    "developers": "Developers",
+    "company": "Company",
+    "useCases": "Use Cases",
+    "pricing": "Pricing",
+    "onPremise": "On-Premise",
+    "aiAct": "AI Act",
+    "roadmap": "Roadmap",
+    "apiDocs": "API Docs",
+    "widgetTypes": "Widget Types",
+    "selfHosting": "Self-Hosting",
+    "mcpServer": "MCP Server",
+    "pandoStudio": "Pando Studio",
+    "github": "GitHub",
+    "discord": "Discord",
+    "copyright": "© 2026 Pando Studio",
+    "license": "MIT License"
   }
 }

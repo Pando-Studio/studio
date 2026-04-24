@@ -1,11 +1,10 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
-import { LanguageSwitcher } from '@/components/language-switcher';
+import { PublicHeader } from '@/components/layout/public-header';
+import { PublicFooter } from '@/components/layout/public-footer';
 import {
-  ArrowLeft,
   Shield,
   AlertTriangle,
   CheckCircle2,
@@ -91,15 +90,8 @@ export default function AIActPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-            {t('backToHome')}
-          </Link>
-          <LanguageSwitcher />
-        </div>
+      <PublicHeader />
+      <div className="max-w-4xl mx-auto px-4 pt-20 pb-12">
 
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
@@ -274,6 +266,7 @@ export default function AIActPage() {
           <p className="text-xs text-muted-foreground italic">{t('disclaimer')}</p>
         </div>
       </div>
+      <PublicFooter />
     </div>
   );
 }

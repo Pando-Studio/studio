@@ -32,6 +32,12 @@
           "enum": ["1", "2"],
           "default": "2",
           "description": "Nombre de voix"
+        },
+        "ttsProvider": {
+          "type": "string",
+          "enum": ["openai", "mistral", "elevenlabs", "gemini"],
+          "default": "mistral",
+          "description": "Fournisseur de synthese vocale"
         }
       }
     },
@@ -66,7 +72,7 @@
                   "text": { "type": "string" },
                   "type": { "type": "string", "enum": ["intro", "discussion", "example", "summary", "transition", "outro"] }
                 },
-                "required": ["id", "speakerId", "text", "type"]
+                "required": ["id", "text", "type"]
               }
             },
             "chapters": {

@@ -4,8 +4,8 @@
 
 This directory contains the complete technical specifications for the **Studio** application — an AI-powered authoring platform that transforms documents into interactive web components.
 
-For product-level documentation (vision, concept, roadmap), see the KMS: `1.projets/qiplim/2.intents/studio/`
-For the Widget Protocol Specification (WPS++), see the KMS: `1.projets/qiplim/3.specs/studio/widget-protocol-spec/`
+For product-level documentation (vision, concept, roadmap), see the KMS: `1.projects/qiplim/2.intents/studio/`
+For the Widget Protocol Specification (WPS++), see the KMS: `1.projects/qiplim/3.specs/studio/widget-protocol-spec/`
 
 ## Document Index
 

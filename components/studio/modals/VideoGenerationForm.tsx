@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Label } from '@/components/ui';
@@ -27,11 +27,25 @@ const DURATION_OPTIONS = [
   { value: '10', label: '10 min' },
 ];
 
+const CINEMATIC_DURATION_OPTIONS = [
+  { value: '0.5', label: '30s' },
+  ...DURATION_OPTIONS,
+];
+
 const TONE_OPTIONS = [
   { value: 'casual', label: 'Decontracte' },
   { value: 'professional', label: 'Professionnel' },
   { value: 'academic', label: 'Academique' },
 ];
+
+const TTS_OPTIONS = [
+  { value: 'openai', label: 'OpenAI' },
+  { value: 'mistral', label: 'Mistral' },
+  { value: 'elevenlabs', label: 'ElevenLabs' },
+  { value: 'gemini', label: 'Gemini' },
+] as const;
+
+type TtsProvider = (typeof TTS_OPTIONS)[number]['value'];
 
 const CINEMATIC_PROVIDERS = [
   { value: 'kling', label: 'Kling 3.0', costPerSec: 0.075, description: 'Meilleur rapport qualite/prix' },
@@ -41,9 +55,14 @@ const CINEMATIC_PROVIDERS = [
 ] as const;
 
 function estimateCinematicCost(durationMin: string, costPerSec: number): string {
-  const seconds = parseInt(durationMin) * 60;
+  const seconds = parseFloat(durationMin) * 60;
   const cost = seconds * costPerSec;
   return cost.toFixed(2);
+}
+
+function formatDuration(durationMin: string): string {
+  const min = parseFloat(durationMin);
+  return min < 1 ? `${Math.round(min * 60)}s` : `${min} min`;
 }
 
 export function VideoGenerationForm({
@@ -66,6 +85,21 @@ export function VideoGenerationForm({
   // Cinematic options
   const [cinematicProvider, setCinematicProvider] = useState<string>('kling');
 
+  // TTS provider (used by slideshow narration and cinematic audio)
+  const [ttsProvider, setTtsProvider] = useState<TtsProvider>('elevenlabs');
+  const [ttsAvailability, setTtsAvailability] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetch(`/api/studios/${studioId}/tts-providers`)
+      .then((res) => res.json())
+      .then((data) => {
+        const avail: Record<string, boolean> = {};
+        for (const p of data.providers ?? []) avail[p.key] = p.available;
+        setTtsAvailability(avail);
+      })
+      .catch(() => {});
+  }, [studioId]);
+
   const selectedCinematicProvider = CINEMATIC_PROVIDERS.find(p => p.value === cinematicProvider) ?? CINEMATIC_PROVIDERS[0];
 
   const handleGenerate = async () => {
@@ -78,6 +112,7 @@ export function VideoGenerationForm({
             tone,
             includeSlideImages,
             imageProvider,
+            ttsProvider,
             mode: 'slideshow',
           }
         : {
@@ -85,6 +120,7 @@ export function VideoGenerationForm({
             tone,
             mode: 'cinematic',
             cinematicProvider,
+            ttsProvider,
           };
 
       const response = await fetch(`/api/studios/${studioId}/widgets/generate`, {
@@ -203,7 +239,7 @@ export function VideoGenerationForm({
         <div className="space-y-2">
           <Label>Duree cible</Label>
           <div className="flex gap-2 flex-wrap">
-            {DURATION_OPTIONS.map((opt) => (
+            {(mode === 'cinematic' ? CINEMATIC_DURATION_OPTIONS : DURATION_OPTIONS).map((opt) => (
               <Button
                 key={opt.value}
                 variant={targetDuration === opt.value ? 'default' : 'outline'}
@@ -230,6 +266,31 @@ export function VideoGenerationForm({
               </Button>
             ))}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Synthese vocale</Label>
+          <div className="flex gap-2 flex-wrap">
+            {TTS_OPTIONS.map((opt) => {
+              const available = ttsAvailability[opt.value] !== false;
+              return (
+                <Button
+                  key={opt.value}
+                  variant={ttsProvider === opt.value ? 'default' : 'outline'}
+                  size="sm"
+                  disabled={!available}
+                  onClick={() => setTtsProvider(opt.value)}
+                  className={!available ? 'opacity-50 cursor-not-allowed' : ''}
+                  title={!available ? 'Cle API non configuree' : undefined}
+                >
+                  {opt.label}
+                </Button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            ElevenLabs recommande pour le francais. Mistral TTS actuellement KO.
+          </p>
         </div>
       </div>
 
@@ -324,7 +385,7 @@ export function VideoGenerationForm({
                   Mode cinematique — cout eleve
                 </p>
                 <p className="text-xs text-orange-700">
-                  Estimation pour {targetDuration} min avec {selectedCinematicProvider.label} :&nbsp;
+                  Estimation pour {formatDuration(targetDuration)} avec {selectedCinematicProvider.label} :&nbsp;
                   <span className="font-bold">
                     ~${estimateCinematicCost(targetDuration, selectedCinematicProvider.costPerSec)}
                   </span>

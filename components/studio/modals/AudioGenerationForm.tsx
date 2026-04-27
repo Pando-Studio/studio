@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Label } from '@/components/ui';
@@ -38,6 +38,15 @@ const SPEAKER_OPTIONS = [
   { value: '2', label: '2 voix (dialogue)' },
 ];
 
+const TTS_OPTIONS = [
+  { value: 'openai', label: 'OpenAI' },
+  { value: 'mistral', label: 'Mistral' },
+  { value: 'elevenlabs', label: 'ElevenLabs' },
+  { value: 'gemini', label: 'Gemini' },
+] as const;
+
+type TtsProvider = (typeof TTS_OPTIONS)[number]['value'];
+
 export function AudioGenerationForm({
   studioId,
   selectedSourceIds,
@@ -50,6 +59,19 @@ export function AudioGenerationForm({
   const [tone, setTone] = useState('casual');
   const [style, setStyle] = useState('discussion');
   const [speakerCount, setSpeakerCount] = useState('2');
+  const [ttsProvider, setTtsProvider] = useState<TtsProvider>('elevenlabs');
+  const [ttsAvailability, setTtsAvailability] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetch(`/api/studios/${studioId}/tts-providers`)
+      .then((res) => res.json())
+      .then((data) => {
+        const avail: Record<string, boolean> = {};
+        for (const p of data.providers ?? []) avail[p.key] = p.available;
+        setTtsAvailability(avail);
+      })
+      .catch(() => {});
+  }, [studioId]);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -65,6 +87,7 @@ export function AudioGenerationForm({
             tone,
             style,
             speakerCount,
+            ttsProvider,
           },
           sourceIds: Array.from(selectedSourceIds),
           language: 'fr',
@@ -168,6 +191,31 @@ export function AudioGenerationForm({
               </Button>
             ))}
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Synthese vocale</Label>
+          <div className="flex gap-2 flex-wrap">
+            {TTS_OPTIONS.map((opt) => {
+              const available = ttsAvailability[opt.value] !== false;
+              return (
+                <Button
+                  key={opt.value}
+                  variant={ttsProvider === opt.value ? 'default' : 'outline'}
+                  size="sm"
+                  disabled={!available}
+                  onClick={() => setTtsProvider(opt.value)}
+                  className={!available ? 'opacity-50 cursor-not-allowed' : ''}
+                  title={!available ? 'Cle API non configuree' : undefined}
+                >
+                  {opt.label}
+                </Button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            ElevenLabs recommande pour le francais. Mistral TTS actuellement KO.
+          </p>
         </div>
       </div>
 

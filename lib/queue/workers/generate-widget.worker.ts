@@ -131,13 +131,44 @@ async function processJob(
       if (isAudioGeneration && generatedData.script) {
         try {
           const { generatePodcastAudio } = await import('../../ai/tts');
-          const script = generatedData.script as { segments: Array<{ id: string; speakerId: string; text: string; type: string }> };
+          const script = generatedData.script as { segments: Array<{ id: string; speakerId?: string; text: string; type: string }> };
           const voices = generatedData.voices as Array<{ id: string; name: string; role: string }> | undefined;
+
+          // Defensive normalization: Mistral-large sometimes omits speakerId on segments
+          // where the id prefix already implies the speaker (e.g. id="expert3"). Fill in
+          // by matching id prefix to a voice id or role, falling back to alternation.
+          let lastSpeakerId: string | undefined;
+          for (const seg of script.segments) {
+            if (seg.speakerId) {
+              lastSpeakerId = seg.speakerId;
+              continue;
+            }
+            const matchByVoiceId = voices?.find((v) => seg.id.startsWith(v.id));
+            const matchByRole = voices?.find((v) => seg.id.startsWith(v.role));
+            const inferred =
+              matchByVoiceId?.id ??
+              matchByRole?.id ??
+              (lastSpeakerId
+                ? voices?.find((v) => v.id !== lastSpeakerId)?.id
+                : voices?.[0]?.id);
+            if (inferred) {
+              seg.speakerId = inferred;
+              lastSpeakerId = inferred;
+              logger.warn(`Inferred missing speakerId for segment ${seg.id} -> ${inferred}`, { runId });
+            }
+          }
 
           const ttsProvider = ((inputs as Record<string, unknown>).ttsProvider as string) || 'openai';
           logger.generation(`Generating podcast audio (TTS: ${ttsProvider})`, { runId, segmentCount: script.segments.length });
 
-          const audioResult = await generatePodcastAudio(script, voices, studioId, ttsProvider as import('../../ai/tts').TTSProviderKey);
+          // After normalization above, every segment has a speakerId (or is dropped).
+          const normalizedScript = {
+            segments: script.segments.filter((s): s is { id: string; speakerId: string; text: string; type: string } => !!s.speakerId),
+          };
+          if (normalizedScript.segments.length === 0) {
+            throw new Error('All segments missing speakerId after normalization');
+          }
+          const audioResult = await generatePodcastAudio(normalizedScript, voices, studioId, ttsProvider as import('../../ai/tts').TTSProviderKey);
           generatedData.audioUrl = audioResult.audioUrl;
           generatedData.duration = audioResult.durationSeconds;
           generatedData.transcript = audioResult.transcript;

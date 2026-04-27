@@ -18,15 +18,21 @@
         },
         "targetDuration": {
           "type": "string",
-          "enum": ["1", "3", "5", "10"],
+          "enum": ["0.5", "1", "3", "5", "10"],
           "default": "3",
-          "description": "Duree cible en minutes"
+          "description": "Duree cible en minutes (0.5 = 30s, dispo en mode cinematic pour limiter les couts)"
         },
         "tone": {
           "type": "string",
           "enum": ["casual", "professional", "academic"],
           "default": "professional",
           "description": "Ton de la narration"
+        },
+        "ttsProvider": {
+          "type": "string",
+          "enum": ["openai", "mistral", "elevenlabs", "gemini"],
+          "default": "mistral",
+          "description": "Fournisseur de synthese vocale"
         }
       }
     },

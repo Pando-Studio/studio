@@ -44,18 +44,19 @@ const TTS_TO_PROVIDER_KEY: Record<TTSProviderKey, ProviderKey> = {
 
 const VOICE_MAP: Record<TTSProviderKey, Record<string, string>> = {
   openai: { host: 'nova', expert: 'onyx', narrator: 'alloy' },
-  mistral: { host: 'jessica', expert: 'alex', narrator: 'emma' },
+  // Voxtral TTS only ships one French speaker (Marie). We vary emotion per role.
+  mistral: { host: 'fr_marie_happy', expert: 'fr_marie_neutral', narrator: 'fr_marie_neutral' },
   elevenlabs: {
-    host: '21m00Tcm4TlvDq8ikWAM',     // Rachel
-    expert: 'pNInz6obpgDQGcFmaJgB',    // Adam
-    narrator: 'EXAVITQu4vr4xnSDxMaL',  // Bella
+    host: 'cgSgspJ2msm6clMCkdW9',      // Jessica — playful, bright, warm
+    expert: 'nPczCjzI2devNBz1zQrb',    // Brian — deep, resonant
+    narrator: 'JBFqnCBsd6RMkjVDRZzb',  // George — warm storyteller
   },
   gemini: { host: 'Kore', expert: 'Charon', narrator: 'Aoede' },
 };
 
 const TTS_MODEL_NAMES: Record<TTSProviderKey, string> = {
   openai: 'tts-1',
-  mistral: 'mistral-tts-latest',
+  mistral: 'voxtral-mini-tts-2603',
   elevenlabs: 'eleven_multilingual_v2',
   gemini: 'google-cloud-tts',
 };
@@ -106,31 +107,42 @@ async function generateWithMistralTTS(
   voiceId: string,
   apiKey: string,
 ): Promise<TTSResult> {
-  const response = await fetch('https://api.mistral.ai/v1/audio/speech', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'mistral-tts-latest',
-      voice: voiceId,
-      input: text,
-      response_format: 'mp3',
-    }),
-  });
+  const maxAttempts = 3;
+  let lastError = '';
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const response = await fetch('https://api.mistral.ai/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'voxtral-mini-tts-2603',
+        voice_id: voiceId,
+        input: text,
+        response_format: 'mp3',
+      }),
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Mistral TTS failed: ${response.status} - ${errorText}`);
+    if (response.ok) {
+      // Voxtral returns JSON: { audio_data: "<base64>" } — not a raw audio stream.
+      const data = (await response.json()) as { audio_data?: string };
+      if (!data.audio_data) {
+        throw new Error('Mistral TTS: missing audio_data in response');
+      }
+      return {
+        audioBuffer: Buffer.from(data.audio_data, 'base64'),
+        durationEstimateMs: estimateDurationMs(text),
+        model: 'voxtral-mini-tts-2603',
+      };
+    }
+
+    lastError = `${response.status} - ${await response.text()}`;
+    // Retry on transient Mistral 5xx (e.g. 500 Service unavailable). Bail on 4xx.
+    if (response.status < 500 || attempt === maxAttempts) break;
+    await new Promise((r) => setTimeout(r, 1000 * attempt));
   }
-
-  const arrayBuffer = await response.arrayBuffer();
-  return {
-    audioBuffer: Buffer.from(arrayBuffer),
-    durationEstimateMs: estimateDurationMs(text),
-    model: 'mistral-tts-latest',
-  };
+  throw new Error(`Mistral TTS failed: ${lastError}`);
 }
 
 async function generateWithElevenLabsTTS(

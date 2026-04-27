@@ -217,14 +217,22 @@ const generatorStep = new Step({
     console.log(`[generate-widget] Step 3/3 system prompt (${template.generation.systemPrompt.length} chars)`);
     console.log(`[generate-widget] Step 3/3 user prompt (${userPrompt.length} chars), context (${contextText.length} chars)`);
 
-    // Generate content
-    const result = await generateObject({
-      model,
-      schema: outputSchema,
-      system: template.generation.systemPrompt,
-      prompt: userPrompt,
-      ...params,
-    });
+    let result;
+    try {
+      result = await generateObject({
+        model,
+        schema: outputSchema,
+        system: template.generation.systemPrompt,
+        prompt: userPrompt,
+        ...params,
+      });
+    } catch (err) {
+      const elapsed = Date.now() - t0;
+      const msg = err instanceof Error ? err.message : String(err);
+      const cause = err instanceof Error && err.cause ? ` | cause: ${String(err.cause)}` : '';
+      console.error(`[generate-widget] Step 3/3 FAILED — ${elapsed}ms, model=${model.modelId ?? 'unknown'}, error: ${msg}${cause}`);
+      throw err;
+    }
 
     const elapsed = Date.now() - t0;
     const output = result.object as Record<string, unknown>;

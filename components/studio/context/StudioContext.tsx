@@ -115,7 +115,18 @@ export function StudioProvider({ studioId, children }: StudioProviderProps) {
 
   // SSE: receive real-time events from workers via Redis pub/sub
   // Disabled for viewers (SSE endpoint requires auth, causes retry loop for anonymous users)
-  useStudioEvents({ studioId, onEvent: () => {}, enabled: studio?.role !== 'viewer' });
+  const handleStudioEvent = useCallback(
+    (event: { type: string; [key: string]: unknown }) => {
+      if (event.type === 'generation:complete' || event.type === 'widget:updated') {
+        queryClient.invalidateQueries({ queryKey: queryKeys.studios.detail(studioId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.runs.byStudio(studioId) });
+      } else if (event.type === 'source:status') {
+        queryClient.invalidateQueries({ queryKey: queryKeys.studios.detail(studioId) });
+      }
+    },
+    [studioId, queryClient],
+  );
+  useStudioEvents({ studioId, onEvent: handleStudioEvent, enabled: studio?.role !== 'viewer' });
   const coursePlansQuery = useStudioCoursePlans(studioId);
   const favoritesQuery = useFavorites();
   const updateStudioMut = useUpdateStudioMutation(studioId);
@@ -127,20 +138,17 @@ export function StudioProvider({ studioId, children }: StudioProviderProps) {
   // --- Zustand UI state ---
   const uiStore = useStudioUI();
 
-  // Auto-refresh widgets when a generation run completes
-  const WIDGET_RUN_TYPES = useMemo(
-    () => new Set(['QUIZ', 'WORDCLOUD', 'ROLEPLAY', 'MULTIPLE_CHOICE', 'POSTIT', 'RANKING', 'OPENTEXT']),
-    [],
-  );
-
+  // Fallback for SSE: invalidate widgets list whenever any widget-targeting run
+  // transitions to COMPLETED/FAILED. The SSE handler above is the primary path;
+  // this catches cases where the SSE connection drops mid-generation.
   useEffect(() => {
     const hasCompleted = runs.some(
-      (r) => WIDGET_RUN_TYPES.has(r.type) && (r.status === 'COMPLETED' || r.status === 'FAILED'),
+      (r) => r.widgetId && (r.status === 'COMPLETED' || r.status === 'FAILED'),
     );
     if (hasCompleted) {
       queryClient.invalidateQueries({ queryKey: queryKeys.studios.detail(studioId) });
     }
-  }, [runs, studioId, queryClient, WIDGET_RUN_TYPES]);
+  }, [runs, studioId, queryClient]);
 
   // Auto-select all sources on first load
   useEffect(() => {

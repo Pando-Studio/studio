@@ -452,7 +452,7 @@ export const VideoConfigSchema = z.object({
   generationConfig: z.object({
     mode: z.enum(['slideshow', 'cinematic']).default('slideshow'),
     slideCount: z.number().min(3).max(30).default(8),
-    targetDuration: z.enum(['1', '3', '5', '10']).default('3'),
+    targetDuration: z.enum(['0.5', '1', '3', '5', '10']).default('3'),
     tone: z.enum(['casual', 'professional', 'academic']).default('professional'),
     ttsProvider: z.enum(['openai', 'mistral', 'elevenlabs', 'gemini']).default('openai'),
     includeSubtitles: z.boolean().default(true),
